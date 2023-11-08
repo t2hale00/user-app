@@ -21,6 +21,10 @@ function Signup() {
       const handleSubmit = e => {
         e.preventDefault();
         setErrors(Validation(values));
+        const err = Validation(values);
+        setErrors(err);
+        if(err.name === "" && err.email === "" && err.password === ""){
+            
       }
 
   return (
