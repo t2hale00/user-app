@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
-const port = 5000;
 const cors = require('cors');
 const mysql = require('mysql');
 
 app.use(cors());
+app.use(express.json());
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -12,6 +12,7 @@ const db = mysql.createConnection({
     password: 'LEAHmae185!!!',
     database: 'consumerdb'
 });
+
 
 app.post('/signup', (req, res) => {
     const sql = "INSERT INTO user ('name', 'email', 'password') VALUES ('?', '?', '?')";
@@ -28,6 +29,6 @@ app.post('/signup', (req, res) => {
     });
 })
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+app.listen(8081, () => {
+    console.log(`Listening...`);
 });
