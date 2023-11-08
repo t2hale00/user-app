@@ -60,7 +60,7 @@ function Signup() {
            onChange={handleInput}/>
            {errors.password &&  <span className='text-danger'>{errors.password}</span>}
         </div>
-        <button className='btn btn-success w-100 rounded-0'>Create Account</button>
+        <button type="submit" className='btn btn-success w-100 rounded-0'>Create Account</button>
         
         <div className='d-flex justify-content-center align-items-center'>
             <p>Already have an account?</p>
