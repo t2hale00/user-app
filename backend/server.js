@@ -8,7 +8,7 @@ app.use(express.json());
 
 const db = mysql.createConnection({
     host: 'localhost',
-    root: 'root',
+    user: 'root',
     password: 'LEAHmae185!!!',
     database: 'consumerdb'
 });
@@ -28,8 +28,8 @@ app.post('/signup', (req, res) => {
         } 
         return res.status(201).json({ message: "User registered successfully" });
     });
-})
+});
 
-app.listen(8082, () => {
+app.listen(8081, () => {
     console.log(`Listening...`);
 });
