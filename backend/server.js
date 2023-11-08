@@ -30,6 +30,20 @@ app.post('/signup', (req, res) => {
     });
 });
 
+app.post('/login', (req, res) => {
+    const sql = "SELECT * FROM user WHERE `email` = ? AND `password` = ?";
+    
+    db.query(sql, [req.body.email, req.body.password ], (err, data) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: "Error while saving user to the database" });
+        } if (data.length > 0) {
+            return res.status(200).json({ message: "Login successful" });
+        } else {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+    });
+});
 app.listen(8081, () => {
     console.log(`Listening...`);
 });

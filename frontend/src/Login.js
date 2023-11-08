@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Validation from './LoginValidation';
+import axios from 'axios';
 
 
 function Login() {
@@ -10,6 +12,8 @@ function Login() {
   })
 
   const [errors, setErrors] = useState({})
+
+  const navigate = useNavigate();
 
   const handleInput = e => {
     const {name, value} = e.target;
@@ -23,6 +27,17 @@ function Login() {
     e.preventDefault();
     setErrors(Validation(values));
 
+    if(errors.email === "" && errors.password === ""){
+      axios.post('http://localhost:8081/login', values)
+      .then(res => {
+          if(res.message === "Login successful") {
+            navigate('/home');
+      } else {
+        alert("No record existed");
+      }
+      })
+      .catch(err => console.log(err));
+      }
   }
 
   return (
@@ -44,7 +59,7 @@ function Login() {
             {errors.password &&  <span className='text-danger'>{errors.password}</span>}
           </div>
 
-          <button tyoe='submit' className='btn btn-success w-100 rounded-0'>Log in</button>
+          <button type='submit' onSubmit={handleSubmit} className='btn btn-success w-100 rounded-0'>Log in</button>
           
           <div className='d-flex justify-content-center align-items-center'>
             <p>No account yet?</p>

@@ -6,6 +6,7 @@ import axios from 'axios';
 
 function Signup() {
     const [values, setValues] = useState({
+        name: '',
         email: '',
         password: ''
       })
