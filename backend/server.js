@@ -15,7 +15,7 @@ const db = mysql.createConnection({
 
 
 app.post('/signup', (req, res) => {
-    const sql = "INSERT INTO user ('name', 'email', 'password') VALUES ('?', '?', '?')";
+    const sql = "INSERT INTO user (`name`, `email`, `password`) VALUES (?)";
     const values = [
         req.body.name, 
         req.body.email, 
@@ -23,12 +23,13 @@ app.post('/signup', (req, res) => {
     ];
     db.query(sql, [values], (err, data) => {
         if (err) {
-            return res.json("Error");
+            console.error(err);
+            return res.status(500).json({ error: "Error while saving user to the database" });
         } 
-        return res.json(data);
+        return res.status(201).json({ message: "User registered successfully" });
     });
 })
 
-app.listen(8081, () => {
+app.listen(8082, () => {
     console.log(`Listening...`);
 });

@@ -28,7 +28,7 @@ function Signup() {
         setErrors(err);
 
         if(errors.name === "" && errors.email === "" && errors.password === ""){
-          axios.post('http://localhost:3001/signup', values)
+          axios.post('http://localhost:8081/signup', values)
           .then(res => {
             navigate('/');
           })
@@ -60,7 +60,7 @@ function Signup() {
            onChange={handleInput}/>
            {errors.password &&  <span className='text-danger'>{errors.password}</span>}
         </div>
-        <button type="submit" className='btn btn-success w-100 rounded-0'>Create Account</button>
+        <button type="submit" onSubmit={handleSubmit} className='btn btn-success w-100 rounded-0'>Create Account</button>
         
         <div className='d-flex justify-content-center align-items-center'>
             <p>Already have an account?</p>
