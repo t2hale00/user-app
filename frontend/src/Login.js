@@ -30,11 +30,7 @@ function Login() {
     if(errors.email === "" && errors.password === ""){
       axios.post('http://localhost:8081/login', values)
       .then(res => {
-          if(res.message === "Login successful") {
-            navigate('/home');
-      } else {
-        alert("No record existed");
-      }
+        navigate('/home');
       })
       .catch(err => console.log(err));
       }
