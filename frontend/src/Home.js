@@ -4,21 +4,11 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
       <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
-        <div className='bg-white p-3 rounded w-25'>
-          <h2>Log In</h2>
-          <form action="">
-            
-  
-            
-  
-            <button type='submit' className='btn btn-success w-100 rounded-0'>Send Parcel</button>
-            
-            <div className='d-flex justify-content-center align-items-center'>
-              
-            </div>
-  
-            <Link to="/" className='btn btn-default border w-100 bg-light rounded-0'>Create Account</Link>
-          </form>
+        <div className='bg-white p-3 rounded w-25 '>
+          <h2>Hello user!</h2>
+            <Link to="/sendparcel" className='btn btn-default border-primary w-100 bg-light rounded-0'>Send Parcel</Link>
+            <Link to="/notifications" className='btn btn-default border-primary w-100 bg-light rounded-0'>Notifications</Link>  
+            <Link to="/accountsettings" className='btn btn-default border-primary w-100 bg-light rounded-0'>Account Settings</Link>
         </div>
       </div>
     )
