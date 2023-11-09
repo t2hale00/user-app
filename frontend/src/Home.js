@@ -14,7 +14,7 @@ function Home() {
             <button type='submit' className='btn btn-success w-100 rounded-0'>Send Parcel</button>
             
             <div className='d-flex justify-content-center align-items-center'>
-              <p>No account yet?</p>
+              
             </div>
   
             <Link to="/" className='btn btn-default border w-100 bg-light rounded-0'>Create Account</Link>
