@@ -29,12 +29,10 @@ function Login() {
     setErrors(Validation(values));
 
     if(errors.email === "" && errors.password === ""){
-      axios.post('http://localhost:8081/login', values)
+      axios
+      .post('http://localhost:8081/', values)
       .then(res => {
-        const { token } = res.data;
-        // Store the token securely (e.g., in an HTTP-only cookie or local storage)
-        // For simplicity, let's store it in local storage for now
-        localStorage.setItem('token', token);
+        console.log(res.data);
         navigate('/home');
         })
         .catch(err => {
@@ -51,21 +49,30 @@ function Login() {
         <form action="" onSubmit={handleSubmit}>
           <div className='mb-3'>
             <label htmlFor="email"><strong>Email</strong></label>
-            <input type="email" className='form-control rounded-0' placeholder=' Enter email' name='email' 
-            onChange={handleInput}/>
-           {errors.email &&  <span className='text-danger'>{errors.email}</span>}
+            <input 
+              type="email" 
+              className='form-control rounded-0' 
+              placeholder=' Enter email' 
+              name='email' 
+              onChange={handleInput}
+            />
+            {errors.email &&  <span className='text-danger'>{errors.email}</span>}
           </div>
 
           <div className='mb-3'>
             <label htmlFor="password"><strong>Password</strong></label>
-            <input type="password" className='form-control rounded-0' placeholder=' Enter password' name='password'
-            onChange={handleInput}/>
+            <input 
+              type="password" 
+              className='form-control rounded-0' 
+              placeholder=' Enter password' 
+              name='password'
+              onChange={handleInput}
+            />
             {errors.password &&  <span className='text-danger'>{errors.password}</span>}
           </div>
 
           <button type='submit' onSubmit={handleSubmit} className='btn btn-success w-100 rounded-0'>Log in</button>
           {loginError && <div className='text-danger'>{loginError}</div>}
-
           <div className='d-flex justify-content-center align-items-center'>
             <p>No account yet?</p>
           </div>
