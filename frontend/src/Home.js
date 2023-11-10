@@ -9,6 +9,7 @@ function Home() {
             <Link to="/sendparcel" className='btn btn-default border-primary w-100 bg-light rounded-0'>Send Parcel</Link>
             <Link to="/notifications" className='btn btn-default border-primary w-100 bg-light rounded-0'>Notifications</Link>  
             <Link to="/accountsettings" className='btn btn-default border-primary w-100 bg-light rounded-0'>Account Settings</Link>
+            <Link to="/" className='btn btn-default border-primary w-100 bg-light rounded-0'>Log Out</Link>
         </div>
       </div>
     )

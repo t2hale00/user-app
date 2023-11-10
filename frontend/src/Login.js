@@ -11,7 +11,8 @@ function Login() {
     password: ''
   })
 
-  const [errors, setErrors] = useState({})
+  const [errors, setErrors] = useState({});
+  const [loginError, setLoginError] = useState('');
 
   const navigate = useNavigate();
 
@@ -30,11 +31,18 @@ function Login() {
     if(errors.email === "" && errors.password === ""){
       axios.post('http://localhost:8081/login', values)
       .then(res => {
+        const { token } = res.data;
+        // Store the token securely (e.g., in an HTTP-only cookie or local storage)
+        // For simplicity, let's store it in local storage for now
+        localStorage.setItem('token', token);
         navigate('/home');
-      })
-      .catch(err => console.log(err));
+        })
+        .catch(err => {
+          setLoginError('Invalid credentials');
+          console.log(err);
+      });
       }
-  }
+    }
 
   return (
     <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
@@ -56,7 +64,8 @@ function Login() {
           </div>
 
           <button type='submit' onSubmit={handleSubmit} className='btn btn-success w-100 rounded-0'>Log in</button>
-          
+          {loginError && <div className='text-danger'>{loginError}</div>}
+
           <div className='d-flex justify-content-center align-items-center'>
             <p>No account yet?</p>
           </div>
