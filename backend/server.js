@@ -61,7 +61,7 @@ app.post('/signup', (req, res) => {
     });
 });*/
 
-app.post('/', (req, res) => {
+app.post('/login', (req, res) => {
     const email = req.body.email.trim();
     const password = req.body.password.trim();
 

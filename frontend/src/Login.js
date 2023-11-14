@@ -35,7 +35,7 @@ function Login() {
         console.log(res.data);
         navigate('/home');
         })
-        .catch(err => {
+        .catch((err) => {
           setLoginError('Invalid credentials');
           console.log(err);
       });
