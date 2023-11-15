@@ -6,6 +6,7 @@ import Home from './Home';
 import SendParcel from './SendParcel';
 import Notifications from './Notifications';
 import AccountSettings from './AccountSettings';
+import Logout from './Logout';
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path='/sendparcel' element={<SendParcel />} />
         <Route path='/notifications' element={<Notifications />} />
         <Route path='/accountsettings' element={<AccountSettings />} />
+        <Route path='/logout' element={<Logout />} />
       </Routes>
       <div style={{ marginTop: '50px', textAlign: 'center', color: 'black' }}>
         <p>OAMK, Advanced Web Applications Development, GSL</p>
