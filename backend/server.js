@@ -33,7 +33,7 @@ app.post('/signup', (req, res) => {
     });
 });
 
-app.post('/login', (req, res) => {
+/*app.post('/login', (req, res) => {
     const sql = "SELECT * FROM user WHERE LOWER(email) = LOWER(?) AND password = ?"; 
     const values = [
         req.body.email,
@@ -65,7 +65,41 @@ app.post('/login', (req, res) => {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
     });
-});
+});*/
+
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+   
+    // If the user provides empty fields
+    if (!email || !password) {
+       return res.status(400).json({ message: 'Email and password are required' });
+    }
+   
+    // Fetch the user from the database by email
+    const user = await user.findOne({ email });
+   
+    // If the user does not exist in the database
+    if (!user) {
+       return res.status(400).json({ message: 'User does not exist' });
+    }
+   
+    // If the provided password does not match the one in the database
+    const isMatch = await bcrypt.compare(password, user.password);
+   
+    if (!isMatch) {
+       return res.status(400).json({ message: 'Invalid email or password' });
+    }
+   
+    // Additional validation: Check if the provided username matches the stored username
+    const providedUsername = req.body.username;
+    if (providedUsername !== user.username) {
+       return res.status(400).json({ message: 'Password and username do not match' });
+    }
+   
+    // If everything is good, create a JWT and return it in the response
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token });
+    });
 
   
 
