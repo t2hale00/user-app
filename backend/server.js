@@ -33,54 +33,21 @@ app.post('/signup', (req, res) => {
     });
 });
 
-/*app.post('/', (req, res) => {
-    const sql = "SELECT * FROM user WHERE `email` = ? AND `password` = ?";
-
-    db.query(sql, [req.body.email, req.body.password], (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: "Error while querying the database" });
-        }
-        if (data.length > 0) {
-            // User found, generate JWT
-            const user = {
-                id: data[0].id,
-                email: data[0].email,
-            };
-
-            jwt.sign({ user }, jwtSecretKey, { expiresIn: '1h' }, (jwtErr, token) => {
-                if (jwtErr) {
-                    console.error(jwtErr);
-                    return res.status(500).json({ message: "Error while generating JWT" });
-                }
-                return res.status(200).json({ token });
-            });
-        } else {
-            return res.status(401).json({ message: "Invalid credentials" });
-        }
-    });
-});*/
-
 app.post('/login', (req, res) => {
-    const email = req.body.email.trim();
-    const password = req.body.password.trim();
-
-    //const { email, password } = req.body;
+    const sql = "SELECT * FROM user WHERE LOWER(email) = LOWER(?) AND password = ?"; 
+    const values = [
+        req.body.email,
+        req.body.password
+    ];
   
-    if (!email || !password) {
+    if (!req.body.email || !req.body.password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
-  
-    //const sql = "SELECT * FROM user WHERE email = ? AND password = ?";
-    const sql = "SELECT * FROM user WHERE LOWER(email) = LOWER(?) AND password = ?";
 
-    console.log('Received email:', email);
-    console.log('Received password:', password);
+    console.log('Received email:', req.body.email);
+    console.log('Received password:', req.body.password);
 
-// Your database query here
-
-
-    db.query(sql, [email, password], (err, data) => {
+    db.query(sql, values, (err, data) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: 'Error while querying the database' });
@@ -98,7 +65,8 @@ app.post('/login', (req, res) => {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
     });
-  });
+});
+
   
 
 app.listen(8081, () => {
