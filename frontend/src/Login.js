@@ -109,7 +109,10 @@ function Login() {
       
       const navigate = useNavigate();
     
-      const [errors, setErrors] = useState({})
+      const [errors, setErrors] = useState({
+        email: '',
+        password: ''
+      })
     
       const handleInput = e => {
         const {name, value} = e.target;

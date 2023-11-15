@@ -13,7 +13,11 @@ function Signup() {
       
       const navigate = useNavigate();
     
-      const [errors, setErrors] = useState({})
+      const [errors, setErrors] = useState({
+        name: '',
+        email: '',
+        password: ''
+      })
     
       const handleInput = e => {
         const {name, value} = e.target;

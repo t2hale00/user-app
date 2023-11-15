@@ -7,9 +7,14 @@ import SendParcel from './SendParcel';
 import Notifications from './Notifications';
 import AccountSettings from './AccountSettings';
 
+
 function App() {
   return (
     <BrowserRouter>
+      <div style={{ textAlign: 'center', marginTop: '50px' }}>
+        <h1 style={{ fontSize: '5em', color: 'blue' }}>Parcel</h1>
+        <p style={{ fontSize: '2em', color: 'darkblue' }}>Send parcels locally conveniently.</p>
+      </div>
       <Routes>
         <Route path='/' element={<Login />} />
         <Route path='/signup' element={<Signup />} />
@@ -18,6 +23,10 @@ function App() {
         <Route path='/notifications' element={<Notifications />} />
         <Route path='/accountsettings' element={<AccountSettings />} />
       </Routes>
+      <div style={{ marginTop: '50px', textAlign: 'center', color: 'black' }}>
+        <p>OAMK, Advanced Web Applications Development, GSL</p>
+        <p>&copy; {new Date().getFullYear()} Parcel</p>
+      </div>
     </BrowserRouter>
   );
 }
