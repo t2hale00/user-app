@@ -43,42 +43,52 @@ function Login() {
     }
 
   return (
-    <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
-      <div className='bg-white p-3 rounded w-25'>
-        <h2>Log In</h2>
-        <form action="" onSubmit={handleSubmit}>
-          <div className='mb-3'>
-            <label htmlFor="email"><strong>Email</strong></label>
-            <input 
-              type="email" 
-              className='form-control rounded-0' 
-              placeholder=' Enter email' 
-              name='email' 
-              onChange={handleInput}
-            />
-            {errors.email &&  <span className='text-danger'>{errors.email}</span>}
-          </div>
+    <div>
+      {/* Header */}
+      <header className='bg-white text-center py-3'>
+        <h1 className='display-1 text-primary'>Parcel</h1>
+        <p className='lead text-primary'>
+          Send parcels locally conveniently. 
+        </p>
+      </header>
 
-          <div className='mb-3'>
-            <label htmlFor="password"><strong>Password</strong></label>
-            <input 
-              type="password" 
-              className='form-control rounded-0' 
-              placeholder=' Enter password' 
-              name='password'
-              onChange={handleInput}
-            />
-            {errors.password &&  <span className='text-danger'>{errors.password}</span>}
-          </div>
+      <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
+        <div className='bg-white p-3 rounded w-25'>
+          <h2>Log In</h2>
+          <form action="" onSubmit={handleSubmit}>
+            <div className='mb-3'>
+              <label htmlFor="email"><strong>Email</strong></label>
+              <input 
+                type="email" 
+                className='form-control rounded-0' 
+                placeholder=' Enter email' 
+                name='email' 
+                onChange={handleInput}
+              />
+              {errors.email &&  <span className='text-danger'>{errors.email}</span>}
+            </div>
 
-          <button type='submit' onSubmit={handleSubmit} className='btn btn-success w-100 rounded-0'>Log in</button>
-          {loginError && <div className='text-danger'>{loginError}</div>}
-          <div className='d-flex justify-content-center align-items-center'>
-            <p>No account yet?</p>
-          </div>
+            <div className='mb-3'>
+              <label htmlFor="password"><strong>Password</strong></label>
+              <input 
+                type="password" 
+                className='form-control rounded-0' 
+                placeholder=' Enter password' 
+                name='password'
+                onChange={handleInput}
+              />
+              {errors.password &&  <span className='text-danger'>{errors.password}</span>}
+            </div>
 
-          <Link to="/signup" className='btn btn-default border w-100 bg-light rounded-0'>Create Account</Link>
-        </form>
+            <button type='submit' onSubmit={handleSubmit} className='btn btn-success w-100 rounded-0'>Log in</button>
+            {loginError && <div className='text-danger'>{loginError}</div>}
+            <div className='d-flex justify-content-center align-items-center'>
+              <p>No account yet?</p>
+            </div>
+
+            <Link to="/signup" className='btn btn-default border w-100 bg-light rounded-0'>Create Account</Link>
+          </form>
+        </div>
       </div>
     </div>
   )
