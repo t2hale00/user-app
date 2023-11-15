@@ -5,6 +5,45 @@ import Validation from './LoginValidation';
 import axios from 'axios';
 
 function Login() {
+  const [values, setValues] = useState({
+    email: '',
+    password: ''
+  });
+
+  const navigate = useNavigate();
+
+  const [errors, setErrors] = useState({
+    email: '',
+    password: ''
+  });
+
+  const handleInput = e => {
+    const { name, value } = e.target;
+    setValues({
+      ...values,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = async e => {
+    e.preventDefault();
+    const err = Validation(values);
+    setErrors(err);
+
+    if (err.email === '' && err.password === '') {
+      try {
+        const response = await axios.post('http://localhost:8081/login', values);
+        console.log(response.data.user); // Check if user data is received
+
+        // Redirect to home page
+        navigate('/home');
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+/*function Login() {
     const [values, setValues] = useState({
         email: '',
         password: ''
@@ -39,7 +78,7 @@ function Login() {
           }
             
       }
-
+*/
   return (
     <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
       <div className='bg-white p-3 rounded w-25'>
