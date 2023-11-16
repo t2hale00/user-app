@@ -33,7 +33,10 @@ function Login() {
     if (err.email === '' && err.password === '') {
       try {
         const response = await axios.post('http://localhost:8081/login', values);
-        console.log(response.data.user); // Check if user data is received
+        //console.log(response.data.user); // Check if user data is received
+         const token = response.data.token;
+
+         localStorage.setItem('token', token);
 
         // Redirect to home page
         navigate('/home');
@@ -43,42 +46,6 @@ function Login() {
     }
   };
 
-/*function Login() {
-    const [values, setValues] = useState({
-        email: '',
-        password: ''
-      })
-      
-      const navigate = useNavigate();
-    
-      const [errors, setErrors] = useState({
-        email: '',
-        password: ''
-      })
-    
-      const handleInput = e => {
-        const {name, value} = e.target;
-        setValues({
-          ...values,
-          [name]: value
-        })
-      }
-    
-      const handleSubmit = e => {
-        e.preventDefault();
-        const err = Validation(values);
-        setErrors(err);
-
-        if(errors.email === "" && errors.password === ""){
-          axios.post('http://localhost:8081/login', values)
-          .then(res => {
-            navigate('/home');
-          })
-          .catch(err => console.log(err));
-          }
-            
-      }
-*/
   return (
     <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
       <div className='bg-white p-3 rounded w-25'>

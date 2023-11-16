@@ -5,7 +5,7 @@ import Signup from './Signup';
 import Home from './Home';
 import SendParcel from './SendParcel';
 import Notifications from './Notifications';
-import AccountSettings from './AccountSettings';
+import DeleteAccountButton from './DeleteAccount';
 import Logout from './Logout';
 
 
@@ -22,7 +22,7 @@ function App() {
         <Route path='/home' element={<Home />} />
         <Route path='/sendparcel' element={<SendParcel />} />
         <Route path='/notifications' element={<Notifications />} />
-        <Route path='/accountsettings' element={<AccountSettings />} />
+        <Route path='/deleteaccount' element={<DeleteAccountButton />} />
         <Route path='/logout' element={<Logout />} />
       </Routes>
       <div style={{ marginTop: '50px', textAlign: 'center', color: 'black' }}>

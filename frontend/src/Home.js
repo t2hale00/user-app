@@ -8,8 +8,8 @@ function Home() {
           <h2>Hello user!</h2>
             <Link to="/sendparcel" className='btn btn-default border-primary w-100 bg-light rounded-0'>Send Parcel</Link>
             <Link to="/notifications" className='btn btn-default border-primary w-100 bg-light rounded-0'>Notifications</Link>  
-            <Link to="/accountsettings" className='btn btn-default border-primary w-100 bg-light rounded-0'>Account Settings</Link>
-            <Link to="/logout" className='btn btn-default border-primary w-100 bg-light rounded-0'>Log Out</Link>
+            <Link to="/deleteaccount" className='btn btn-default border-primary w-100 bg-light rounded-0'><span style={{ color: 'red' }}>Delete Account</span></Link>
+            <Link to="/logout" className='btn btn-default border-primary w-100 bg-light rounded-0'><span style={{ color: 'green' }}>Log Out</span></Link>
         </div>
       </div>
     )

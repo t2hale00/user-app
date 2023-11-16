@@ -6,7 +6,7 @@ const app = express();
 const cors = require('cors');
 const mysql = require('mysql');
 //const bodyParser = require('body-parser');
-//const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 app.use(cors());
 app.use(express.json());
@@ -22,7 +22,7 @@ const db = mysql.createConnection({
     database: 'consumerdb'
 });
 
-//const jwtSecretKey = 'my_secret_key';
+const jwtSecretKey = 'my_secret_key';
 
 app.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
@@ -63,17 +63,22 @@ app.post('/login', async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (isMatch) {
-        // Store user data in session
+        /*// Store user data in session
         req.session.user = {
           id: user.id,
           email: user.email,
-          // Add more user-related information as needed
         };
-
         return res.status(200).json({ user: req.session.user });
       } else {
         return res.status(401).json({ message: 'Invalid email or password' });
-      }
+      }*/
+      // Generate JWT token
+      const token = jwt.sign({ userId: user.id, userEmail: user.email }, jwtSecretKey, { expiresIn: '1h' });
+
+      return res.status(200).json({ token });
+    } else {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
     } else {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -84,7 +89,41 @@ app.get('/logout', (req, res) => {
     req.session.destroy();
     res.status(200).json({ message: 'Logout successful' });
     });
-    
+
+    // Delete account endpoint
+app.delete('/deleteaccount', async (req, res) => {
+    // Check if the user is authenticated (you might want to enhance this check)
+    const userId = req.session.user?.id;
+    const token = req.headers.authorization;
+  
+    /*if (!userId || !token) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+  
+    // Verify the JWT token
+    try {
+      jwt.verify(token, jwtSecretKey);
+    } catch (error) {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+  */
+    // Delete the account from the database
+    const deleteSql = "DELETE FROM user WHERE id = ?";
+    const deleteValues = [userId];
+  
+    db.query(deleteSql, deleteValues, (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Error while deleting the account" });
+      }
+  
+      // Clear session and send response
+      req.session.destroy();
+      res.status(200).json({ message: 'Account deleted successfully' });
+    });
+  });
+
+
 app.listen(8081, () => {
     console.log(`Listening...`);
 });
