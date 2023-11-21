@@ -85,6 +85,38 @@ app.post('/login', async (req, res) => {
   });
 });
 
+app.get ('/user', (req, res) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, jwtSecretKey);
+    const userId = decoded.userId;
+
+    const sql = "SELECT * FROM user WHERE id = ?";
+    const values = [userId];
+
+    db.query(sql, values, (err, data) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Error while querying the database" });
+      }
+
+      if (data.length > 0) {
+        const user = data[0];
+        return res.status(200).json({ user });
+      } else {
+        return res.status(404).json({ message: 'User not found' });
+      }
+    });
+  } catch (error) {
+    return res.status(401).json({ message: 'Invalid token' });
+  }
+});
+
 app.get('/logout', (req, res) => {
     req.session.destroy();
     res.status(200).json({ message: 'Logout successful' });
@@ -122,6 +154,7 @@ app.delete('/deleteaccount', async (req, res) => {
       res.status(200).json({ message: 'Account deleted successfully' });
     });
   });
+
 // API endpoint to get all locations
 app.get('/locations', (req, res) => {
   const query = 'SELECT * FROM locations';
@@ -135,6 +168,7 @@ app.get('/locations', (req, res) => {
     }
   });
 });
+
   // API endpoint to handle sending parcel information
 app.post('/sendParcel', (req, res) => {
   const parcelInfo = req.body;
