@@ -85,7 +85,7 @@ app.post('/login', async (req, res) => {
   });
 });
 
-app.get ('/user', (req, res) => {
+app.get ('/profile', (req, res) => {
   const token = req.headers.authorization;
 
   if (!token) {
