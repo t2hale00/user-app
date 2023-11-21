@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Dropdown } from 'react-bootstrap';
-import { GeoAltFill } from 'react-bootstrap-icons';
+//import { GeoAltFill } from 'react-bootstrap-icons';
 
 function SendParcel() {
+  const [locations, setLocations] = useState([]);
   const [parcelInfo, setParcelInfo] = useState({
     size: {
       width: '',
@@ -24,6 +25,21 @@ function SendParcel() {
     reservationCode: '',
   });
 
+  useEffect(() => {
+    // Fetch locations from the backend when the component mounts
+    fetchLocations();
+  }, []);
+
+  const fetchLocations = async () => {
+    try {
+      const response = await fetch('/locations'); // Assuming your backend API endpoint for locations
+      const data = await response.json();
+      setLocations(data);
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+    }
+  };
+
   function handleInputChange(category, field, value) {
     setParcelInfo((prevParcelInfo) => ({
       ...prevParcelInfo,
@@ -44,26 +60,58 @@ function SendParcel() {
   }
 
   function generateReservationCode(location) {
-    return Math.random().toString(36).substr(2, 6).toUpperCase();
+    // Generate a random 4-digit number
+    const fourDigitCode = Math.floor(1000 + Math.random() * 9000);
+    return fourDigitCode.toString();
   }
 
-  function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Parcel Information:', parcelInfo);
-    // Reset form or navigate to the next step
-  }
+  
+    // Assuming you have a form with input fields and you want to collect their values
+    const formData = new FormData(e.target);
+    const parcelInfo = {};
+    formData.forEach((value, key) => {
+      parcelInfo[key] = value;
+    });
+  
+    try {
+      // Send parcelInfo to the backend API
+      const response = await fetch('/sendParcel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(parcelInfo),
+      });
+  
+      if (response.ok) {
+        console.log('Parcel Information sent successfully:', parcelInfo);
+        // Reset form or navigate to the next step
+      } else {
+        console.error('Failed to send Parcel Information');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
 
   return (
-    <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
-      <div className='bg-white p-3 rounded w-25'>
-      <h1>Send Parcel</h1>
-      <Form onSubmit={handleSubmit}>
+    <div className='d-flex flex-column justify-content-center align-items-center bg-primary'>
+      <div className='p-3 rounded w-25' style={{ color: 'white', borderColor: 'lightblue', borderWidth: '5px', borderStyle: 'solid', width: '300px', textAlign: 'center', marginBottom: '30px' }}>
+        <h1>Send Parcel</h1>
+      </div>
+      <div className='bg-white p-3 rounded w-25 '>
+        
         {/* Parcel Size */}
+      <h1>Parcel Size</h1>
+      <Form onSubmit={handleSubmit}>
         <Form.Group controlId="formSizeWidth">
           <Form.Label>Width</Form.Label>
           <Form.Control
             type="number"
-            placeholder="Enter width"
+            placeholder="Enter width in cm"
             value={parcelInfo.size.width}
             onChange={(e) => handleInputChange('size', 'width', e.target.value)}
             required
@@ -74,7 +122,7 @@ function SendParcel() {
           <Form.Label>Height</Form.Label>
           <Form.Control
             type="number"
-            placeholder="Enter height"
+            placeholder="Enter height in cm"
             value={parcelInfo.size.height}
             onChange={(e) => handleInputChange('size', 'height', e.target.value)}
             required
@@ -82,10 +130,10 @@ function SendParcel() {
         </Form.Group>
 
         <Form.Group controlId="formSizeDepth">
-          <Form.Label>Depth</Form.Label>
+          <Form.Label>Length</Form.Label>
           <Form.Control
             type="number"
-            placeholder="Enter depth"
+            placeholder="Enter lentgh in cm"
             value={parcelInfo.size.depth}
             onChange={(e) => handleInputChange('size', 'depth', e.target.value)}
             required
@@ -96,19 +144,87 @@ function SendParcel() {
           <Form.Label>Mass</Form.Label>
           <Form.Control
             type="number"
-            placeholder="Enter mass"
+            placeholder="Enter mass in kg"
             value={parcelInfo.size.mass}
             onChange={(e) => handleInputChange('size', 'mass', e.target.value)}
             required
           />
         </Form.Group>
 
+        {/* Sender Information */}
+        <h3>Sender Information</h3>
+        <Form.Group controlId="formSenderName">
+          <Form.Label>Sender Name</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter sender name"
+            value={parcelInfo.sender.name}
+            onChange={(e) => handleInputChange('sender', 'name', e.target.value)}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group controlId="formSenderAddress">
+          <Form.Label>Sender Address</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter sender address"
+            value={parcelInfo.sender.address}
+            onChange={(e) => handleInputChange('sender', 'address', e.target.value)}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group controlId="formSenderPhoneNumber">
+          <Form.Label>Sender Phone Number</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter sender phone number"
+            value={parcelInfo.sender.phoneNumber}
+            onChange={(e) => handleInputChange('sender', 'phoneNumber', e.target.value)}
+            required
+          />
+        </Form.Group>
+
         {/* Recipient Information */}
-        {/* ... Repeat the structure for recipient and sender information ... */}
+        <h3>Recipient Information</h3>
+        <Form.Group controlId="formRecipientName">
+          <Form.Label>Recipient Name</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter recipient name"
+            value={parcelInfo.recipient.name}
+            onChange={(e) => handleInputChange('recipient', 'name', e.target.value)}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group controlId="formRecipientAddress">
+          <Form.Label>Recipient Address</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter recipient address"
+            value={parcelInfo.recipient.address}
+            onChange={(e) => handleInputChange('recipient', 'address', e.target.value)}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group controlId="formRecipientPhoneNumber">
+          <Form.Label>Recipient Phone Number</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter recipient phone number"
+            value={parcelInfo.recipient.phoneNumber}
+            onChange={(e) => handleInputChange('recipient', 'phoneNumber', e.target.value)}
+            required
+          />
+        </Form.Group>
 
         {/* Delivery Location Dropdown */}
+        <h3>Delivery Location</h3>
         <Form.Group controlId="formLocation">
-          <Form.Label>Delivery Location</Form.Label>
+          <Form.Label>Select location</Form.Label>
           <Dropdown onSelect={handleLocationSelect}>
             <Dropdown.Toggle variant="secondary" id="dropdown-location">
               {parcelInfo.location ? parcelInfo.location : 'Select Location'}

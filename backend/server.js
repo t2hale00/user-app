@@ -122,7 +122,36 @@ app.delete('/deleteaccount', async (req, res) => {
       res.status(200).json({ message: 'Account deleted successfully' });
     });
   });
+// API endpoint to get all locations
+app.get('/locations', (req, res) => {
+  const query = 'SELECT * FROM locations';
 
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error('Error fetching locations:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+  // API endpoint to handle sending parcel information
+app.post('/sendParcel', (req, res) => {
+  const parcelInfo = req.body;
+
+  // Handle saving parcelInfo to the database or perform other actions as needed
+  const insertQuery = 'INSERT INTO parcels SET ?';
+  
+
+  connection.query(insertQuery, parcelInfo, (err) => {
+    if (err) {
+      console.error('Error saving parcel information:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    } else {
+      res.status(200).json({ message: 'Parcel Information received successfully' });
+    }
+  });
+});
 
 app.listen(8081, () => {
     console.log(`Listening...`);
