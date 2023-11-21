@@ -1,12 +1,13 @@
 const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const { createTokens } = require ('./JWT');
 const bcrypt = require('bcrypt');
 const app = express();
 const cors = require('cors');
 const mysql = require('mysql');
 //const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
+//const jwt = require('jsonwebtoken');
 
 app.use(cors());
 app.use(express.json());
@@ -43,7 +44,27 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  const user = await user.findOne({ where: { email: email } });
+
+  if (!user) res.status(400).json ({ message: 'User not found' });
+
+  const dbPassword = user.password;
+  bcrypt.compare(password, dbPassword).then((match) => {
+    if (!match) {
+      res
+      .status(400)
+      .json ({ error: 'Wrong email and password combination' });
+    } else {  
+
+      const accessToken = createTokens(user);
+      res.cookie('access-token', accessToken, { 
+        maxAge: 60 * 60 * 24 * 30 * 1000, httpOnly: true });
+      res.json ("Logged in successfully");
+    }
+  });
+});
+
+  /*if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required' });
   }
 
@@ -62,7 +83,7 @@ app.post('/login', async (req, res) => {
       // Compare hashed password
       const isMatch = await bcrypt.compare(password, user.password);
 
-      if (isMatch) {
+      if (isMatch) {*/
         /*// Store user data in session
         req.session.user = {
           id: user.id,
@@ -73,7 +94,7 @@ app.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Invalid email or password' });
       }*/
       // Generate JWT token
-      const token = jwt.sign({ userId: user.id, userEmail: user.email }, jwtSecretKey, { expiresIn: '1h' });
+      /*const token = jwt.sign({ userId: user.id, userEmail: user.email }, jwtSecretKey, { expiresIn: '1h' });
 
       return res.status(200).json({ token });
     } else {
@@ -82,8 +103,7 @@ app.post('/login', async (req, res) => {
     } else {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-  });
-});
+  });*/
 
 app.get ('/profile', (req, res) => {
   const token = req.headers.authorization;
