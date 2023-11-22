@@ -33,15 +33,17 @@ function Login() {
     if (err.email === '' && err.password === '') {
       try {
         const response = await axios.post('http://localhost:8081/login', values);
-        //console.log(response.data.user); // Check if user data is received
-         const token = response.data.token;
+        const { token, user } = response.data;
 
          localStorage.setItem('token', token);
 
+         console.log('Authentication succeeded:', user);
+
         // Redirect to home page
-        navigate('/home');
+        navigate('/profile');
       } catch (error) {
-        console.log(error);
+        console.error('Authentication failed:', error.response?.data || error.message);
+        setErrors({ email: 'Invalid email or password', password: 'Invalid email or password' });
       }
     }
   };
