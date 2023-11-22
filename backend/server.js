@@ -1,13 +1,15 @@
 const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const { createTokens } = require ('./JWT');
+const { createTokens, validateToken } = require('./JWT');
+
 const bcrypt = require('bcrypt');
 const app = express();
 const cors = require('cors');
 const mysql = require('mysql');
+
 //const bodyParser = require('body-parser');
-//const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 
 app.use(cors());
 app.use(express.json());
@@ -23,8 +25,8 @@ const db = mysql.createConnection({
     database: 'consumerdb'
 });
 
-const jwtSecretKey = 'my_secret_key';
 
+// signup endpoint
 app.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,32 +43,10 @@ app.post('/signup', async (req, res) => {
   });
 });
 
+
+//Login endpoint
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
-  const user = await user.findOne({ where: { email: email } });
-
-  if (!user) res.status(400).json ({ message: 'User not found' });
-
-  const dbPassword = user.password;
-  bcrypt.compare(password, dbPassword).then((match) => {
-    if (!match) {
-      res
-      .status(400)
-      .json ({ error: 'Wrong email and password combination' });
-    } else {  
-
-      const accessToken = createTokens(user);
-      res.cookie('access-token', accessToken, { 
-        maxAge: 60 * 60 * 24 * 30 * 1000, httpOnly: true });
-      res.json ("Logged in successfully");
-    }
-  });
-});
-
-  /*if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
-  }
 
   const sql = "SELECT * FROM user WHERE LOWER(email) = LOWER(?)";
   const values = [email];
@@ -79,107 +59,70 @@ app.post('/login', async (req, res) => {
 
     if (data.length > 0) {
       const user = data[0];
-
-      // Compare hashed password
       const isMatch = await bcrypt.compare(password, user.password);
 
-      if (isMatch) {*/
-        /*// Store user data in session
-        req.session.user = {
-          id: user.id,
-          email: user.email,
-        };
-        return res.status(200).json({ user: req.session.user });
+      if (isMatch) {
+        const accessToken = jwt.createTokens({ id: user.id, email: user.email });
+        res.cookie('access-token', accessToken, {
+          maxAge: 60 * 60 * 24 * 30 * 1000,
+          httpOnly: true,
+        });
+
+        res.json({ message: "Logged in successfully", user: { id: user.id, email: user.email } });
       } else {
-        return res.status(401).json({ message: 'Invalid email or password' });
-      }*/
-      // Generate JWT token
-      /*const token = jwt.sign({ userId: user.id, userEmail: user.email }, jwtSecretKey, { expiresIn: '1h' });
-
-      return res.status(200).json({ token });
+        res.status(400).json({ error: 'Wrong email and password combination' });
+      }
     } else {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      res.status(400).json({ message: 'User not found' });
     }
-    } else {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-  });*/
+  });
+});
 
-app.get ('/profile', (req, res) => {
-  const token = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-
+// Protected Profile endpoint
+app.get("/profile", jwt.validateToken, (req, res) => {
   try {
-    const decoded = jwt.verify(token, jwtSecretKey);
-    const userId = decoded.userId;
-
-    const sql = "SELECT * FROM user WHERE id = ?";
-    const values = [userId];
-
-    db.query(sql, values, (err, data) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Error while querying the database" });
-      }
-
-      if (data.length > 0) {
-        const user = data[0];
-        return res.status(200).json({ user });
-      } else {
-        return res.status(404).json({ message: 'User not found' });
-      }
+    jwt.validateToken(req, res, () => {
+      res.redirect('/profile.js');
     });
   } catch (error) {
-    return res.status(401).json({ message: 'Invalid token' });
+    res.status(401).json({ error: 'Invalid token' });
   }
 });
 
-app.get('/logout', (req, res) => {
-    req.session.destroy();
-    res.status(200).json({ message: 'Logout successful' });
-    });
 
-    // Delete account endpoint
-app.delete('/deleteaccount', async (req, res) => {
-    // Check if the user is authenticated (you might want to enhance this check)
-    const userId = req.session.user?.id;
-    const token = req.headers.authorization;
-  
-    /*if (!userId || !token) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-  
-    // Verify the JWT token
-    try {
-      jwt.verify(token, jwtSecretKey);
-    } catch (error) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
-  */
-    // Delete the account from the database
-    const deleteSql = "DELETE FROM user WHERE id = ?";
-    const deleteValues = [userId];
-  
-    db.query(deleteSql, deleteValues, (err, data) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: "Error while deleting the account" });
-      }
-  
-      // Clear session and send response
-      req.session.destroy();
-      res.status(200).json({ message: 'Account deleted successfully' });
-    });
+// Logout endpoint
+  app.get('/logout', (req, res) => {
+    res.clearCookie('access-token');
+    res.status(200).json({ message: 'Logout successful' });
   });
+
+
+// Delete account endpoint
+app.delete('/deleteaccount', jwt.validateToken, async (req, res) => {
+  const userId = req.user.id; // Extract user ID from the decoded token
+
+  const deleteSql = "DELETE FROM user WHERE id = ?";
+  const deleteValues = [userId];
+
+  db.query(deleteSql, deleteValues, (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Error while deleting the account" });
+    }
+
+    // Clear session and send response
+    res.clearCookie('access-token');
+    res.status(200).json({ message: 'Account deleted successfully' });
+  });
+});
+
 
 // API endpoint to get all locations
 app.get('/locations', (req, res) => {
   const query = 'SELECT * FROM locations';
 
-  connection.query(query, (err, results) => {
+  db.query(query, (err, results) => {
     if (err) {
       console.error('Error fetching locations:', err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -197,7 +140,7 @@ app.post('/sendParcel', (req, res) => {
   const insertQuery = 'INSERT INTO parcels SET ?';
   
 
-  connection.query(insertQuery, parcelInfo, (err) => {
+  db.query(insertQuery, parcelInfo, (err) => {
     if (err) {
       console.error('Error saving parcel information:', err);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -206,6 +149,12 @@ app.post('/sendParcel', (req, res) => {
     }
   });
 });
+
+
+//History endpoint
+
+
+//Send Notification endpoint
 
 app.listen(8081, () => {
     console.log(`Listening...`);
