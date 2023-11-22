@@ -2,7 +2,7 @@ import React from 'react';
 import Login from './Login';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Signup from './Signup';
-import Home from './Home';
+import Profile from './Profile';
 import SendParcel from './SendParcel';
 import Notifications from './Notifications';
 import DeleteAccountButton from './DeleteAccount';
@@ -20,7 +20,7 @@ function App() {
         <Routes>
           <Route path='/' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
-          <Route path='/home' element={<Home />} />
+          <Route path='/profile' element={<Profile />} />
           <Route path='/sendparcel' element={<SendParcel />} />
           <Route path='/notifications' element={<Notifications />} />
           <Route path='/deleteaccount' element={<DeleteAccountButton />} />
