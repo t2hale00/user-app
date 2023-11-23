@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const { sign, verify } = require('jsonwebtoken');
 
 const createTokens = (user) => {
@@ -16,7 +17,7 @@ const createTokens = (user) => {
           return res.status(400).json({ error: "User not Authenticated!" });
       
         try {
-          const validToken = verify(accessToken, "jwtsecretplschange");
+          const validToken = verify(accessToken, "jwtsecretplschangethis");
           if (validToken) {
             req.authenticated = true;
             return next();
