@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 
-function Home() {
+function Profile() {
   return (
       <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
         <div className='bg-white p-3 rounded w-25 '>
@@ -15,4 +15,4 @@ function Home() {
     )
 }
 
-export default Home;
+export default Profile;
