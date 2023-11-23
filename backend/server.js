@@ -59,31 +59,26 @@ app.post('/login', async (req, res) => {
 
     if (data.length > 0) {
       const user = data[0];
-      const isMatch = await bcrypt.compare(password, user.password);
+      const accessToken = createTokens({ id: user.id, email: user.email }); // Use the imported function
 
-      if (isMatch) {
-        const accessToken = jwt.createTokens({ id: user.id, email: user.email });
-        res.cookie('access-token', accessToken, {
-          maxAge: 60 * 60 * 24 * 30 * 1000,
-          httpOnly: true,
-        });
+      res.cookie('access-token', accessToken, {
+        maxAge: 60 * 60 * 24 * 30 * 1000,
+        httpOnly: true,
+      });
 
-        res.json({ message: "Logged in successfully", user: { id: user.id, email: user.email } });
-      } else {
-        res.status(400).json({ error: 'Wrong email and password combination' });
-      }
+      res.json({ message: "Logged in successfully", user: { id: user.id, email: user.email } });
     } else {
       res.status(400).json({ message: 'User not found' });
     }
   });
 });
-
+      
 
 // Protected Profile endpoint
-app.get("/profile", jwt.validateToken, (req, res) => {
+app.get("/profile", (req, res) => {
   try {
     jwt.validateToken(req, res, () => {
-      res.redirect('/profile.js');
+      res.redirect('/profile');
     });
   } catch (error) {
     res.status(401).json({ error: 'Invalid token' });
@@ -99,7 +94,7 @@ app.get("/profile", jwt.validateToken, (req, res) => {
 
 
 // Delete account endpoint
-app.delete('/deleteaccount', jwt.validateToken, async (req, res) => {
+app.delete('/deleteaccount', async (req, res) => {
   const userId = req.user.id; // Extract user ID from the decoded token
 
   const deleteSql = "DELETE FROM user WHERE id = ?";
