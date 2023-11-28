@@ -19,7 +19,8 @@ const createTokens = (user) => {
         try {
           const validToken = verify(accessToken, "jwtsecretplschangethis");
           if (validToken) {
-            req.authenticated = true;
+            //req.authenticated = true;
+            req.user = validToken;
             return next();
           }
         } catch (err) {

@@ -3,7 +3,8 @@ import { Form, Button, Dropdown } from 'react-bootstrap';
 //import { GeoAltFill } from 'react-bootstrap-icons';
 
 function SendParcel() {
-  const [locations, setLocations] = useState([]);
+  const [selectedNumber, setSelectedNumber] = useState('');
+  const [locations, setLocations] = useState([]); // ['Location1', 'Location2', 'Location3', 'Location4', 'Location5'
   const [parcelInfo, setParcelInfo] = useState({
     size: {
       width: '',
@@ -25,20 +26,6 @@ function SendParcel() {
     reservationCode: '',
   });
 
-  useEffect(() => {
-    // Fetch locations from the backend when the component mounts
-    fetchLocations();
-  }, []);
-
-  const fetchLocations = async () => {
-    try {
-      const response = await fetch('/locations'); // Assuming your backend API endpoint for locations
-      const data = await response.json();
-      setLocations(data);
-    } catch (error) {
-      console.error('Error fetching locations:', error);
-    }
-  };
 
   function handleInputChange(category, field, value) {
     setParcelInfo((prevParcelInfo) => ({
@@ -51,13 +38,28 @@ function SendParcel() {
   }
 
   function handleLocationSelect(selectedLocation) {
-    const reservationCode = generateReservationCode(selectedLocation);
     setParcelInfo((prevParcelInfo) => ({
       ...prevParcelInfo,
       location: selectedLocation,
-      reservationCode,
     }));
   }
+
+  const handleNumberSelect = (selectedNumber) => {
+    setSelectedNumber(selectedNumber);
+    if (parcelInfo.location) {
+      const reservationCode = generateReservationCode(parcelInfo.location);
+      setParcelInfo((prevParcelInfo) => ({
+        ...prevParcelInfo,
+        reservationCode,
+      }));
+    } else {
+      // If no location is selected, reset the reservation code
+      setParcelInfo((prevParcelInfo) => ({
+        ...prevParcelInfo,
+        reservationCode: '',
+      }));
+    }
+  };
 
   function generateReservationCode(location) {
     // Generate a random 4-digit number
@@ -77,7 +79,7 @@ function SendParcel() {
   
     try {
       // Send parcelInfo to the backend API
-      const response = await fetch('/sendParcel', {
+      const response = await fetch('http://localhost:8081/sendParcel', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -230,14 +232,32 @@ function SendParcel() {
               {parcelInfo.location ? parcelInfo.location : 'Select Location'}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item eventKey="Location1">Location 1</Dropdown.Item>
-              <Dropdown.Item eventKey="Location2">Location 2</Dropdown.Item>
-              <Dropdown.Item eventKey="Location3">Location 3</Dropdown.Item>
-              <Dropdown.Item eventKey="Location4">Location 4</Dropdown.Item>
-              <Dropdown.Item eventKey="Location5">Location 5</Dropdown.Item>
+              <Dropdown.Item eventKey="Location1">Prisma Linnanmaa Oulu</Dropdown.Item>
+              <Dropdown.Item eventKey="Location2">Prisma Limingantulli Oulu</Dropdown.Item>
+              <Dropdown.Item eventKey="Location3">Prisma Raksila Oulu</Dropdown.Item>
+              <Dropdown.Item eventKey="Location4">K-Citymarket Oulu Rusko</Dropdown.Item>
+              <Dropdown.Item eventKey="Location5">K-Citymarket Oulu Raksila</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Form.Group>
+
+        {parcelInfo.location && (
+        <Form.Group controlId="formNumber">
+          <Form.Label>Select cabinet (1-15)</Form.Label>
+          <Dropdown onSelect={handleNumberSelect}>
+            <Dropdown.Toggle variant="secondary" id="dropdown-number">
+              {selectedNumber ? `Number ${selectedNumber}` : 'Select Number'}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {[...Array(15).keys()].map((number) => (
+                <Dropdown.Item key={number + 1} eventKey={number + 1}>
+                  {number + 1}
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Menu>
+          </Dropdown>
+        </Form.Group>
+      )}
 
         {/* Reservation Code */}
         <Form.Group controlId="formReservationCode">

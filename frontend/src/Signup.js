@@ -27,7 +27,7 @@ function Signup() {
         })
       }
     
-      const handleSubmit = e => {
+      const handleSubmit =  e => {
         e.preventDefault();
         const err = Validation(values);
         setErrors(err);

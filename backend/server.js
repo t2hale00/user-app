@@ -25,6 +25,13 @@ const db = mysql.createConnection({
     database: 'consumerdb'
 });
 
+db.connect((err) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+    return;
+  }
+  console.log('Connected to the database');
+});
 
 // signup endpoint
 app.post('/signup', async (req, res) => {
@@ -61,6 +68,8 @@ app.post('/login', async (req, res) => {
       const user = data[0];
       const accessToken = createTokens({ id: user.id, email: user.email }); // Use the imported function
 
+      req.session.user = { id: user.id, email: user.email };
+      
       res.cookie('access-token', accessToken, {
         maxAge: 60 * 60 * 24 * 30 * 1000,
         httpOnly: true,
@@ -88,9 +97,10 @@ app.get("/profile", (req, res) => {
 
 // Logout endpoint
   app.get('/logout', (req, res) => {
-    res.clearCookie('access-token');
-    res.status(200).json({ message: 'Logout successful' });
-  });
+    req.session.destroy();
+  res.clearCookie('access-token');
+  res.status(200).json({ message: 'Logout successful' });
+});
 
 
 // Delete account endpoint
@@ -128,25 +138,61 @@ app.get('/locations', (req, res) => {
 });
 
   // API endpoint to handle sending parcel information
-app.post('/sendParcel', (req, res) => {
-  const parcelInfo = req.body;
-
-  // Handle saving parcelInfo to the database or perform other actions as needed
-  const insertQuery = 'INSERT INTO parcels SET ?';
+  app.post('/sendParcel', validateToken, async (req, res) => {
+    try {
+      // Extract parcelInfo from req.body
+      const { width, height, length, mass, sendername, senderaddress, senderPhoneNumber, recipientname, recipientaddress, recipientPhoneNumber, location, cabinetnumber, reservationcode, createdat, status } = req.body;
+  
+      // Combine extracted fields into parcelInfo object
+      const parcelInfo = {
+        width, 
+        height, 
+        length, 
+        mass, 
+        sendername, 
+        senderaddress, 
+        senderPhoneNumber, 
+        recipientname, 
+        recipientaddress, 
+        recipientPhoneNumber, 
+        location, 
+        cabinetnumber, 
+        reservationcode, 
+        createdat, 
+        status
+      };
+  
+      // Handle saving parcelInfo to the database
+      const insertQuery = 'INSERT INTO parcel SET ?';
+  
+      db.query(insertQuery, parcelInfo, (err) => {
+        if (err) {
+          console.error('Error saving parcel information:', err);
+          res.status(500).json({ error: 'Internal Server Error' });
+        } else {
+          res.status(200).json({ message: 'Parcel Information received successfully' });
+        }
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
   
 
-  db.query(insertQuery, parcelInfo, (err) => {
+//Create a history endpoint where the user can access sent parcel information
+app.get ('/history', (req, res) => {
+  const query = 'SELECT * FROM parcels';
+
+  db.query(query, (err, results) => {
     if (err) {
-      console.error('Error saving parcel information:', err);
+      console.error('Error fetching parcels:', err);
       res.status(500).json({ error: 'Internal Server Error' });
     } else {
-      res.status(200).json({ message: 'Parcel Information received successfully' });
+      res.json(results);
     }
   });
 });
-
-
-//History endpoint
 
 
 //Send Notification endpoint
