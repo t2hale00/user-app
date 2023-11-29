@@ -83,7 +83,7 @@ app.post('/login', async (req, res) => {
 });
       
 
-// Protected Profile endpoint
+// Protected Profile endpoint?
 app.get("/profile", (req, res) => {
   try {
     jwt.validateToken(req, res, () => {
@@ -137,48 +137,53 @@ app.get('/locations', (req, res) => {
   });
 });
 
-  // API endpoint to handle sending parcel information
-  app.post('/sendParcel', validateToken, async (req, res) => {
-    try {
-      // Extract parcelInfo from req.body
-      const { width, height, length, mass, sendername, senderaddress, senderPhoneNumber, recipientname, recipientaddress, recipientPhoneNumber, location, cabinetnumber, reservationcode, createdat, status } = req.body;
-  
-      // Combine extracted fields into parcelInfo object
-      const parcelInfo = {
-        width, 
-        height, 
-        length, 
-        mass, 
-        sendername, 
-        senderaddress, 
-        senderPhoneNumber, 
-        recipientname, 
-        recipientaddress, 
-        recipientPhoneNumber, 
-        location, 
-        cabinetnumber, 
-        reservationcode, 
-        createdat, 
-        status
-      };
-  
-      // Handle saving parcelInfo to the database
-      const insertQuery = 'INSERT INTO parcel SET ?';
-  
-      db.query(insertQuery, parcelInfo, (err) => {
-        if (err) {
-          console.error('Error saving parcel information:', err);
-          res.status(500).json({ error: 'Internal Server Error' });
-        } else {
-          res.status(200).json({ message: 'Parcel Information received successfully' });
-        }
-      });
-    } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+app.post('/signup', async (req, res) => {
+  const { name, email, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const sql = "INSERT INTO user (`name`, `email`, `password`) VALUES (?, ?, ?)";
+  const values = [name, email, hashedPassword];
+
+  db.query(sql, values, (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Error while saving user to the database" });
     }
+    return res.status(201).json({ message: "User registered successfully" });
   });
-  
+});
+
+
+  // API endpoint to handle sending parcel information
+app.post('/sendParcel', async (req, res) => {
+    const width = req.body.width;
+    const height = req.body.height;
+    const length = req.body.length;
+    const weight = req.body.weight;
+    const senderName = req.body.senderName;
+    const senderAddress = req.body.senderAddress;
+    const senderPhoneNumber= req.body.senderPhoneNumber;
+    const recipientName = req.body.recipientName;
+    const recipientAddress = req.body.recipientAddress;
+    const recipientPhoneNumber = req.body.recipientPhoneNumber;
+    const location = req.body.location;
+    const reservationCode = req.body.reservationCode;
+    
+    db.query('INSERT INTO parcel (width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode) VALUES (?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode],
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send("Values inserted");
+      }
+    }
+  );
+  });
+
+
+
+
 
 //Create a history endpoint where the user can access sent parcel information
 app.get ('/history', (req, res) => {
@@ -198,5 +203,5 @@ app.get ('/history', (req, res) => {
 //Send Notification endpoint
 
 app.listen(8081, () => {
-    console.log(`Listening...`);
+    console.log('Listening on port 8081');
 });
