@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Dropdown } from 'react-bootstrap';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 function SendParcel() {
   const [parcelInfo, setParcelInfo] = useState({
@@ -92,6 +93,20 @@ function SendParcel() {
 
   return (
     <div className='d-flex flex-column justify-content-center align-items-center bg-primary'>
+      <div className='d-flex flex-column justify-content-center align-items-center bg-primary'>
+      {/* Navigation Dropdown */}
+      <Dropdown className="mb-3">
+        <Dropdown.Toggle variant="secondary" id="dropdown-navigation" >
+          Navigate to
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          {/* Define routes for other pages using Link */}
+          <Dropdown.Item as={Link} to="/profile">Home</Dropdown.Item>
+          <Dropdown.Item as={Link} to="/other-page">History</Dropdown.Item>
+          {/* Add more items for other pages as needed */}
+        </Dropdown.Menu>
+      </Dropdown>
+      </div>
       <div className='p-3 rounded w-25' style={{ color: 'white', borderColor: 'lightblue', borderWidth: '5px', borderStyle: 'solid', width: '300px', textAlign: 'center', marginBottom: '30px' }}>
         <h1>Send Parcel</h1>
       </div>
