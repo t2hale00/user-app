@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Button, Dropdown } from 'react-bootstrap';
+import { Form, Button, Dropdown, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
@@ -24,6 +24,8 @@ function SendParcel() {
     location: '',
     reservationCode: '',
   });
+
+  const [notification, setNotification] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,6 +57,36 @@ function SendParcel() {
       });
 
       if (response.status === 200) {
+        // Clear the form
+        setParcelInfo({
+          size: {
+            width: '',
+            height: '',
+            length: '',
+            weight: '',
+          },
+          sender: {
+            name: '',
+            address: '',
+            phoneNumber: '',
+          },
+          recipient: {
+            name: '',
+            address: '',
+            phoneNumber: '',
+          },
+          location: '',
+          reservationCode: '',
+        });
+
+        // Show success notification
+        setNotification(`You have successfully reserved a cabinet in ${location}. Check your previous transactions in the History page.`);
+
+        // Reset notification after a few seconds
+        /*setTimeout(() => {
+          setNotification(null);
+        }, 5000);*/
+
         console.log('Parcel Information sent successfully:', response.data);
         // Reset form or navigate to the next step
       } else {
@@ -107,6 +139,10 @@ function SendParcel() {
         </Dropdown.Menu>
       </Dropdown>
       </div>
+
+       {/* Success Notification */}
+       {notification && <Alert variant="success">{notification}</Alert>}
+
       <div className='p-3 rounded w-25' style={{ color: 'white', borderColor: 'lightblue', borderWidth: '5px', borderStyle: 'solid', width: '300px', textAlign: 'center', marginBottom: '30px' }}>
         <h1>Send Parcel</h1>
       </div>
@@ -261,6 +297,10 @@ function SendParcel() {
         <Button variant="primary" type="submit">
           Submit
         </Button>
+
+        {/* Success Notification */}
+       {notification && <Alert variant="success">{notification}</Alert>}
+
       </Form>
     </div>
     </div>
