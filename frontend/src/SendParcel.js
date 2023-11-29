@@ -134,7 +134,7 @@ function SendParcel() {
         <Dropdown.Menu>
           {/* Define routes for other pages using Link */}
           <Dropdown.Item as={Link} to="/profile">Home</Dropdown.Item>
-          <Dropdown.Item as={Link} to="/other-page">History</Dropdown.Item>
+          <Dropdown.Item as={Link} to="/History">History</Dropdown.Item>
           {/* Add more items for other pages as needed */}
         </Dropdown.Menu>
       </Dropdown>
