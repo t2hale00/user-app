@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Form, Button, Dropdown } from 'react-bootstrap';
-//import { GeoAltFill } from 'react-bootstrap-icons';
+import axios from 'axios';
 
 function SendParcel() {
-  const [selectedNumber, setSelectedNumber] = useState('');
-  const [locations, setLocations] = useState([]); // ['Location1', 'Location2', 'Location3', 'Location4', 'Location5'
   const [parcelInfo, setParcelInfo] = useState({
     size: {
       width: '',
       height: '',
-      depth: '',
-      mass: '',
+      length: '',
+      weight: '',
     },
-    recipient: {
+    sender: {
       name: '',
       address: '',
       phoneNumber: '',
     },
-    sender: {
+    recipient: {
       name: '',
       address: '',
       phoneNumber: '',
@@ -26,6 +24,46 @@ function SendParcel() {
     reservationCode: '',
   });
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Destructure parcelInfo for a cleaner payload
+    const {
+      size,
+      sender,
+      recipient,
+      location,
+      reservationCode,
+    } = parcelInfo;
+
+    // Your Axios post request here
+    try {
+      const response = await axios.post('http://localhost:8081/sendParcel', {
+        width: size.width,
+        height: size.height,
+        length: size.length,
+        weight: size.weight,
+        senderName: sender.name,
+        senderAddress: sender.address,
+        senderPhoneNumber: sender.phoneNumber,
+        recipientName: recipient.name,
+        recipientAddress: recipient.address,
+        recipientPhoneNumber: recipient.phoneNumber,
+        location,
+        reservationCode,
+      });
+
+      if (response.status === 200) {
+        console.log('Parcel Information sent successfully:', response.data);
+        // Reset form or navigate to the next step
+      } else {
+        console.error('Failed to send Parcel Information');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
 
   function handleInputChange(category, field, value) {
     setParcelInfo((prevParcelInfo) => ({
@@ -38,66 +76,19 @@ function SendParcel() {
   }
 
   function handleLocationSelect(selectedLocation) {
+    const reservationCode = generateReservationCode(selectedLocation);
     setParcelInfo((prevParcelInfo) => ({
       ...prevParcelInfo,
       location: selectedLocation,
+      reservationCode,
     }));
   }
-
-  const handleNumberSelect = (selectedNumber) => {
-    setSelectedNumber(selectedNumber);
-    if (parcelInfo.location) {
-      const reservationCode = generateReservationCode(parcelInfo.location);
-      setParcelInfo((prevParcelInfo) => ({
-        ...prevParcelInfo,
-        reservationCode,
-      }));
-    } else {
-      // If no location is selected, reset the reservation code
-      setParcelInfo((prevParcelInfo) => ({
-        ...prevParcelInfo,
-        reservationCode: '',
-      }));
-    }
-  };
 
   function generateReservationCode(location) {
     // Generate a random 4-digit number
     const fourDigitCode = Math.floor(1000 + Math.random() * 9000);
     return fourDigitCode.toString();
   }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    // Assuming you have a form with input fields and you want to collect their values
-    const formData = new FormData(e.target);
-    const parcelInfo = {};
-    formData.forEach((value, key) => {
-      parcelInfo[key] = value;
-    });
-  
-    try {
-      // Send parcelInfo to the backend API
-      const response = await fetch('http://localhost:8081/sendParcel', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(parcelInfo),
-      });
-  
-      if (response.ok) {
-        console.log('Parcel Information sent successfully:', parcelInfo);
-        // Reset form or navigate to the next step
-      } else {
-        console.error('Failed to send Parcel Information');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-  
 
   return (
     <div className='d-flex flex-column justify-content-center align-items-center bg-primary'>
@@ -137,18 +128,18 @@ function SendParcel() {
             type="number"
             placeholder="Enter lentgh in cm"
             value={parcelInfo.size.depth}
-            onChange={(e) => handleInputChange('size', 'depth', e.target.value)}
+            onChange={(e) => handleInputChange('size', 'length', e.target.value)}
             required
           />
         </Form.Group>
 
         <Form.Group controlId="formSizeMass">
-          <Form.Label>Mass</Form.Label>
+          <Form.Label>Weight</Form.Label>
           <Form.Control
             type="number"
-            placeholder="Enter mass in kg"
+            placeholder="Enter weight in kg"
             value={parcelInfo.size.mass}
-            onChange={(e) => handleInputChange('size', 'mass', e.target.value)}
+            onChange={(e) => handleInputChange('size', 'weight', e.target.value)}
             required
           />
         </Form.Group>
@@ -229,35 +220,17 @@ function SendParcel() {
           <Form.Label>Select location</Form.Label>
           <Dropdown onSelect={handleLocationSelect}>
             <Dropdown.Toggle variant="secondary" id="dropdown-location">
-              {parcelInfo.location ? parcelInfo.location : 'Select Location'}
+              {parcelInfo.location ? parcelInfo.location : 'Select location'}
             </Dropdown.Toggle>
             <Dropdown.Menu>
-              <Dropdown.Item eventKey="Location1">Prisma Linnanmaa Oulu</Dropdown.Item>
-              <Dropdown.Item eventKey="Location2">Prisma Limingantulli Oulu</Dropdown.Item>
-              <Dropdown.Item eventKey="Location3">Prisma Raksila Oulu</Dropdown.Item>
-              <Dropdown.Item eventKey="Location4">K-Citymarket Oulu Rusko</Dropdown.Item>
-              <Dropdown.Item eventKey="Location5">K-Citymarket Oulu Raksila</Dropdown.Item>
+              <Dropdown.Item eventKey="Prisma Linnanmaa Oulu">Prisma Linnanmaa Oulu</Dropdown.Item>
+              <Dropdown.Item eventKey="Prisma Limingantulli Oulu">Prisma Limingantulli Oulu</Dropdown.Item>
+              <Dropdown.Item eventKey="Prisma Raksila Oulu">Prisma Raksila Oulu</Dropdown.Item>
+              <Dropdown.Item eventKey="K-Citymarket Oulu Rusko4">K-Citymarket Oulu Rusko</Dropdown.Item>
+              <Dropdown.Item eventKey="K-Citymarket Oulu Raksila">K-Citymarket Oulu Raksila</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
         </Form.Group>
-
-        {parcelInfo.location && (
-        <Form.Group controlId="formNumber">
-          <Form.Label>Select cabinet (1-15)</Form.Label>
-          <Dropdown onSelect={handleNumberSelect}>
-            <Dropdown.Toggle variant="secondary" id="dropdown-number">
-              {selectedNumber ? `Number ${selectedNumber}` : 'Select Number'}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              {[...Array(15).keys()].map((number) => (
-                <Dropdown.Item key={number + 1} eventKey={number + 1}>
-                  {number + 1}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
-        </Form.Group>
-      )}
 
         {/* Reservation Code */}
         <Form.Group controlId="formReservationCode">
