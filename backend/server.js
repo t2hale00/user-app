@@ -204,22 +204,33 @@ app.post('/sendParcel', async (req, res) => {
 );
 });
 
-
-
-
-
 //Create a history endpoint where the user can access sent parcel information
 app.get ('/history', (req, res) => {
-  const query = 'SELECT * FROM parcels';
+ 
+  if (!req.session || !req.session.user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  
+  const userId = req.session.user.userid;
+  const query = 'SELECT * FROM parcel WHERE userId = ?';
 
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error('Error fetching parcels:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      res.json(results);
-    }
-  });
+  
+
+  db.query(query, [userId], (err, results) => {
+    console.log('Query:', query);
+    console.log('User ID:', userId);
+  
+    console.log('Results:', results);
+    console.log('Error:', err);
+    
+  if (err) {
+     console.error('Error fetching parcels:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  } else {
+     res.json(results);
+  }
+});
 });
 
 
