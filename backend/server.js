@@ -119,29 +119,37 @@ app.get("/profile", (req, res) => {
 // Logout endpoint
   app.get('/logout', (req, res) => {
     req.session.destroy();
-  res.clearCookie('access-token');
-  res.status(200).json({ message: 'Logout successful' });
-});
+    res.clearCookie('access-token');
+    res.status(200).json({ message: 'Logout successful' });
+  });
 
 
 // Delete account endpoint
-app.delete('/deleteaccount', async (req, res) => {
-  const userId = req.user.id; // Extract user ID from the decoded token
+app.delete('/deleteaccount', (req, res) => {
+  // Ensure user is logged in (you can adapt this based on your authentication logic)
+  if (!req.session || !req.session.user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
 
-  const deleteSql = "DELETE FROM user WHERE id = ?";
+  const userId = req.session.user.userid;
+
+  const deleteSql = 'DELETE FROM user WHERE userId = ?';
   const deleteValues = [userId];
 
   db.query(deleteSql, deleteValues, (err, data) => {
     if (err) {
       console.error(err);
-      return res.status(500).json({ error: "Error while deleting the account" });
+      res.status(500).json({ error: 'Error while deleting the account' });
+    } else {
+      // Clear session and send response
+      req.session.destroy();
+      res.clearCookie('access-token');
+      res.status(200).json({ message: 'Account deleted successfully' });
     }
-
-    // Clear session and send response
-    res.clearCookie('access-token');
-    res.status(200).json({ message: 'Account deleted successfully' });
   });
 });
+
 
 
 // API endpoint to get all locations
