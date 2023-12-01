@@ -7,6 +7,8 @@ import SendParcel from './SendParcel';
 import Notifications from './Notifications';
 import DeleteAccountButton from './DeleteAccount';
 import Logout from './Logout';
+import History from './History';
+
 
 
 function App() {
@@ -25,6 +27,7 @@ function App() {
           <Route path='/notifications' element={<Notifications />} />
           <Route path='/deleteaccount' element={<DeleteAccountButton />} />
           <Route path='/logout' element={<Logout />} />
+          <Route path='/history' element={<History />} />
         </Routes>
       </div>
       <div style={{ marginTop: '50px', textAlign: 'center', color: 'black' }}>
