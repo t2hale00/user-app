@@ -2,21 +2,30 @@ const express = require('express');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const { createTokens, validateToken } = require('./JWT');
-
 const bcrypt = require('bcrypt');
 const app = express();
 const cors = require('cors');
 const mysql = require('mysql');
-
 //const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+
 app.use(cors());
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: true }));
-
+app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: true, cookie: { path: '/', httpOnly: true }}));
+app.use((req, res, next) => {
+  console.log('Session:', req.session);
+  next();
+});
+app.use(express.json());
 
 const db = mysql.createConnection({
     host: 'localhost',
@@ -67,22 +76,29 @@ app.post('/login', async (req, res) => {
     console.log("Data from the database:", data);
 
 
+
     if (data.length > 0) {
-      const user = data[0];
+      const user = { userid: data[0].userid, email: data[0].email };
 
       // Log the user information before setting it in the session
       console.log("User before setting in session:", { id: user.userid, email: user.email });
 
       const accessToken = createTokens({ id: user.userid, email: user.email }); // Use the imported function
-
-      req.session.user = { id: user.userid, email: user.email };
+      console.log('Generated Access Token:', accessToken);
+      req.session.user = user;
       
       res.cookie('access-token', accessToken, {
         maxAge: 60 * 60 * 24 * 30 * 1000,
         httpOnly: true,
+        sameSite: 'none', // Set to 'none' for cross-domain cookies
+        secure: true,  
       });
 
       res.json({ message: "Logged in successfully", user: { id: user.userid, email: user.email } });
+      console.log("Session:", req.session);
+      console.log("User in session:", req.session.user ? req.session.user.userid : "Not available");
+      console.log('Session after login:', req.session);
+
     } else {
       res.status(400).json({ message: 'User not found' });
     }
@@ -147,35 +163,48 @@ app.get('/locations', (req, res) => {
   // API endpoint to handle sending parcel information
 app.post('/sendParcel', async (req, res) => {
 
-  console.log("User in session:", req.session.user);
+  console.log('Session in /sendParcel:', req.session);
+  
+  console.log('Session:', req.session);
+  console.log('Cookies:', req.cookies);
+
+  // Check if req.session.user is defined before accessing its properties
+  if (!req.session.user) {
+    console.log('User not in session');
+    res.status(401).send('Unauthorized');
+    return;
+  }
 
   const userId = req.session.user.userid;
   const userEmail = req.session.user.email;
 
-    const width = req.body.width;
-    const height = req.body.height;
-    const length = req.body.length;
-    const weight = req.body.weight;
-    const senderName = req.body.senderName;
-    const senderAddress = req.body.senderAddress;
-    const senderPhoneNumber= req.body.senderPhoneNumber;
-    const recipientName = req.body.recipientName;
-    const recipientAddress = req.body.recipientAddress;
-    const recipientPhoneNumber = req.body.recipientPhoneNumber;
-    const location = req.body.location;
-    const reservationCode = req.body.reservationCode;
-    
-    db.query('INSERT INTO parcel (userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode) VALUES (?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode],
-    (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.send("Values inserted");
-      }
+  const width = req.body.width;
+  const height = req.body.height;
+  const length = req.body.length;
+  const weight = req.body.weight;
+  const senderName = req.body.senderName;
+  const senderAddress = req.body.senderAddress;
+  const senderPhoneNumber = req.body.senderPhoneNumber;
+  const recipientName = req.body.recipientName;
+  const recipientAddress = req.body.recipientAddress;
+  const recipientPhoneNumber = req.body.recipientPhoneNumber;
+  const location = req.body.location;
+  const reservationCode = req.body.reservationCode;
+  
+  db.query('INSERT INTO parcel (userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode) VALUES (?,  ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+  [userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode],
+  (err, result) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send("Error inserting values");
+    } else {
+      res.send("Values inserted");
+      console.log("Session:", req.session);
+      console.log("User in session:", req.session.user ? req.session.user.userid : "Not available");
     }
-  );
-  });
+  }
+);
+});
 
 
 
