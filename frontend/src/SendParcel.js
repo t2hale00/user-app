@@ -54,6 +54,8 @@ function SendParcel() {
         recipientPhoneNumber: recipient.phoneNumber,
         location,
         reservationCode,
+    }, {
+        withCredentials: true,
       });
 
       if (response.status === 200) {
@@ -81,11 +83,6 @@ function SendParcel() {
 
         // Show success notification
         setNotification(`You have successfully reserved a cabinet in ${location}. Check your previous transactions in the History page.`);
-
-        // Reset notification after a few seconds
-        /*setTimeout(() => {
-          setNotification(null);
-        }, 5000);*/
 
         console.log('Parcel Information sent successfully:', response.data);
         // Reset form or navigate to the next step
