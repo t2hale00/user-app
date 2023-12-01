@@ -32,7 +32,7 @@ function Login() {
 
     if (err.email === '' && err.password === '') {
       try {
-        const response = await axios.post('http://localhost:8081/login', values);
+        const response = await axios.post('http://localhost:8081/login', values,  { withCredentials: true });
         const { token, user } = response.data;
 
          localStorage.setItem('token', token);
