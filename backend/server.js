@@ -55,7 +55,7 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  const sql = "SELECT * FROM user WHERE LOWER(email) = LOWER(?)";
+  const sql = "SELECT userid, name, email FROM user WHERE LOWER(email) = LOWER(?)";
   const values = [email];
 
   db.query(sql, values, async (err, data) => {
@@ -64,18 +64,25 @@ app.post('/login', async (req, res) => {
       return res.status(500).json({ message: 'Error while querying the database' });
     }
 
+    console.log("Data from the database:", data);
+
+
     if (data.length > 0) {
       const user = data[0];
-      const accessToken = createTokens({ id: user.id, email: user.email }); // Use the imported function
 
-      req.session.user = { id: user.id, email: user.email };
+      // Log the user information before setting it in the session
+      console.log("User before setting in session:", { id: user.userid, email: user.email });
+
+      const accessToken = createTokens({ id: user.userid, email: user.email }); // Use the imported function
+
+      req.session.user = { id: user.userid, email: user.email };
       
       res.cookie('access-token', accessToken, {
         maxAge: 60 * 60 * 24 * 30 * 1000,
         httpOnly: true,
       });
 
-      res.json({ message: "Logged in successfully", user: { id: user.id, email: user.email } });
+      res.json({ message: "Logged in successfully", user: { id: user.userid, email: user.email } });
     } else {
       res.status(400).json({ message: 'User not found' });
     }
@@ -137,25 +144,14 @@ app.get('/locations', (req, res) => {
   });
 });
 
-app.post('/signup', async (req, res) => {
-  const { name, email, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const sql = "INSERT INTO user (`name`, `email`, `password`) VALUES (?, ?, ?)";
-  const values = [name, email, hashedPassword];
-
-  db.query(sql, values, (err, data) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Error while saving user to the database" });
-    }
-    return res.status(201).json({ message: "User registered successfully" });
-  });
-});
-
-
   // API endpoint to handle sending parcel information
 app.post('/sendParcel', async (req, res) => {
+
+  console.log("User in session:", req.session.user);
+
+  const userId = req.session.user.userid;
+  const userEmail = req.session.user.email;
+
     const width = req.body.width;
     const height = req.body.height;
     const length = req.body.length;
@@ -169,8 +165,8 @@ app.post('/sendParcel', async (req, res) => {
     const location = req.body.location;
     const reservationCode = req.body.reservationCode;
     
-    db.query('INSERT INTO parcel (width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode) VALUES (?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode],
+    db.query('INSERT INTO parcel (userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode) VALUES (?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode],
     (err, result) => {
       if (err) {
         console.log(err);
