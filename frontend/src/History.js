@@ -51,19 +51,21 @@ function History() {
             <Col key={parcel.parcelId} xs={12} md={4}>
                 <Card>
                 <Card.Body>
-                    <Card.Title>{`Parcel #${parcel.parcelId}`}</Card.Title>
+                    <Card.Title>{`Parcel #${parcel.parcelid}`}</Card.Title>
                     <Card.Text>
                     <strong>Size:</strong> {`${parcel.width}cm x ${parcel.height}cm x ${parcel.length}cm`}
                     <br />
                     <strong>Weight:</strong> {`${parcel.weight}kg`}
                     <br />
-                    <strong>Sender:</strong> {`${parcel.senderName}, ${parcel.senderAddress}, ${parcel.senderPhoneNumber}`}
+                    <strong>Sender:</strong> {`${parcel.sendername}, ${parcel.senderaddress}, ${parcel.senderPhoneNumber}`}
                     <br />
-                    <strong>Recipient:</strong> {`${parcel.recipientName}, ${parcel.recipientAddress}, ${parcel.recipientPhoneNumber}`}
+                    <strong>Recipient:</strong> {`${parcel.recipientname}, ${parcel.recipientaddress}, ${parcel.recipientPhoneNumber}`}
                     <br />
                     <strong>Location:</strong> {parcel.location}
                     <br />
-                    <strong>Reservation Code:</strong> {parcel.reservationCode}
+                    <strong>Cabinet Code:</strong> {parcel.reservationCode}
+                    <br />
+                    <strong>Status:</strong> {parcel.status}
                     </Card.Text>
                 </Card.Body>
                 </Card>
