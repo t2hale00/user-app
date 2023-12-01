@@ -16,8 +16,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
-app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: true, cookie: { path: '/', httpOnly: true }}));
