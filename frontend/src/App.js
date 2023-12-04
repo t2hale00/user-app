@@ -14,11 +14,11 @@ import History from './History';
 function App() {
   return (
     <BrowserRouter>
-      <div style={{ textAlign: 'center', marginTop: '50px' }}>
-        <h1 style={{ fontSize: '5em', color: 'blue' }}>Parcel</h1>
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <h1 style={{ fontSize: '4em', color: 'blue' }}>Parcel</h1>
         <p style={{ fontSize: '2em', color: 'darkblue' }}>Send parcels locally conveniently.</p>
       </div>
-      <div style={{ flex: 1, width: '100%', marginTop: '50px', marginBottom: '20px', overflowY: 'auto', boxSizing: 'border-box' }}> 
+      <div style={{ flex: 1, width: '100%', marginTop: '30px', marginBottom: '20px', overflowY: 'auto', boxSizing: 'border-box' }}> 
         <Routes>
           <Route path='/' element={<Login />} />
           <Route path='/signup' element={<Signup />} />
@@ -30,7 +30,7 @@ function App() {
           <Route path='/history' element={<History />} />
         </Routes>
       </div>
-      <div style={{ marginTop: '50px', textAlign: 'center', color: 'black' }}>
+      <div style={{ marginTop: '30px', textAlign: 'center', color: 'black' }}>
         <p>OAMK, Advanced Web Applications Development, GSL</p>
         <p>&copy; {new Date().getFullYear()} Parcel</p>
       </div>
