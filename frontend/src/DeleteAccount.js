@@ -9,17 +9,31 @@ const DeleteAccountButton = () => {
   const handleDeleteAccount = async () => {
     try {
       // Replace with your server URL
-      const response = await fetch('http://localhost:3001/deleteaccount', {
+      const response = await fetch('http://localhost:8081/deleteaccount', {
         method: 'DELETE',
         credentials: 'include',  // Add this line to include cookies in the request
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
-      const data = await response.json();
-
       if (response.ok) {
-        setMessage(data.message);
+        // If response is successful, redirect to the signup page
+        setMessage('Account deleted successfully');
+        window.location.href = '/signup';
       } else {
-        setError(data.error);
+        // If response is not successful, handle the error
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          // If the response is JSON, parse and display the error
+          const data = await response.json();
+          setError(data.error);
+        } else {
+          // If the response is not JSON, treat it as text
+          const errorText = await response.text();
+          console.error('Error deleting account:', errorText);
+          setError('Error deleting account. Please try again.');
+        }
       }
     } catch (error) {
       console.error('Error deleting account:', error);
