@@ -126,8 +126,11 @@ app.get("/profile", (req, res) => {
 
 // Delete account endpoint
 app.delete('/deleteaccount', (req, res) => {
+  console.log('User Session:', req.session.user);
+
   // Ensure user is logged in (you can adapt this based on your authentication logic)
   if (!req.session || !req.session.user) {
+    console.log('Unauthorized request to delete account');
     res.status(401).json({ error: 'Unauthorized' });
     return;
   }
