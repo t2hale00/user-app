@@ -51,13 +51,24 @@ const DeleteAccountButton = () => {
             <Dropdown.Menu>
             {/* Define routes for other pages using Link */}
             <Dropdown.Item as={Link} to="/profile">Home</Dropdown.Item>
+            <Dropdown.Item as={Link} to="/sendparcel">Send Parcel</Dropdown.Item>
             <Dropdown.Item as={Link} to="/History">History</Dropdown.Item>
+            <Dropdown.Item as={Link} to="/logout">Logout</Dropdown.Item>
             {/* Add more items for other pages as needed */}
             </Dropdown.Menu>
         </Dropdown>
+        <div className='d-flex justify-content-center align-items-center'>
+            <p>Are you sure you want to delete you account?</p>
+        </div>
         <button type="submit" className='btn btn-danger w-100 rounded-0' onClick={handleDeleteAccount}>Delete Account</button>
         {message && <p>{message}</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
+        <br></br>
+        <div className='d-flex justify-content-center align-items-center'>
+            <p>You can also opt to Logging out instead of Deleting your account.</p>
+        </div>
+        <Link to="/logout" className='btn btn-default bg-light w-100 rounded-0'>Log Out</Link>
+        
     </div>
     </div>
   );
