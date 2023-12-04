@@ -296,11 +296,10 @@ function SendParcel() {
         <Button variant="primary" type="submit">
           Submit
         </Button>
-
-        {/* Success Notification */}
-       {notification && <Alert variant="success">{notification}</Alert>}
-
       </Form>
+      {/* Success Notification */}
+      {notification && <Alert variant="success">{notification}</Alert>}
+
     </div>
     </div>
   );

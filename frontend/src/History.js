@@ -27,8 +27,7 @@ function History() {
 
   return (
     <div className='d-flex flex-column justify-content-center align-items-center bg-primary'>
-        <div className='d-flex flex-column justify-content-center align-items-center bg-primary'>
-        {/* Navigation Dropdown */}
+         {/* Navigation Dropdown */}
         <Dropdown className="mb-3">
             <Dropdown.Toggle variant="secondary" id="dropdown-navigation" >
             Navigate to
@@ -42,16 +41,16 @@ function History() {
             {/* Add more items for other pages as needed */}
             </Dropdown.Menu>
         </Dropdown>
-        </div>
-        <div>
-        <h1>Parcel History</h1>
+        
+        <div >
+        <h1 className="text-center">Parcel History</h1>
 
         {error && <p>{error}</p>}
 
-        <Row>
+        <Row xs={1} md={2} lg={3} xl={4}>
             {parcelHistory.map((parcel) => (
-            <Col key={parcel.parcelId} xs={12} md={4}>
-                <Card>
+            <Col key={parcel.parcelId} >
+                <Card style={{ minWidth: '250px', marginBottom: '20px' }}>
                 <Card.Body>
                     <Card.Title>{`Parcel #${parcel.parcelid}`}</Card.Title>
                     <Card.Text>
