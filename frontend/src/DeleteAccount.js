@@ -67,7 +67,7 @@ const DeleteAccountButton = () => {
         <div className='d-flex justify-content-center align-items-center'>
             <p>You can also opt to Logging out instead of Deleting your account.</p>
         </div>
-        <Link to="/logout" className='btn btn-default bg-light w-100 rounded-0'>Log Out</Link>
+        <Link to="/logout" style={{ color: 'blue' }} className='btn btn-default bg-light w-100 rounded-0'>Log Out</Link>
         
     </div>
     </div>
