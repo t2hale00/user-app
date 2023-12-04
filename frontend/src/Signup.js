@@ -18,6 +18,8 @@ function Signup() {
         email: '',
         password: ''
       })
+
+      const [notification, setNotification] = useState(null);
     
       const handleInput = e => {
         const {name, value} = e.target;
@@ -34,19 +36,26 @@ function Signup() {
 
         if(errors.name === "" && errors.email === "" && errors.password === ""){
           axios.post('http://localhost:8081/signup', values)
-          .then(res => {
-            navigate('/');
-          })
-          .catch(err => console.log(err));
-          }
-            
+          .then((res) => {
+            setNotification('Account created successfully');
+            // Navigate to login page after a short delay
+            setTimeout(() => {
+              navigate('/');
+            }, 3000); })
+          .catch((err) => {
+            console.error(err);
+            setNotification('Error creating account. Please try again.');
+          });
       }
+    };
 
   return (
     <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
       <div className='bg-white p-3 rounded w-25'>
         <h2>Sign up</h2>
         <form action=""  onSubmit={handleSubmit}>
+        {notification && <p className={notification.includes('successfully') ? 'text-success' : 'text-danger'}>{notification}</p>}
+          
         <div className='mb-3'>
           <label htmlFor="email"><strong>Name</strong></label>
           <input type="name" className='form-control rounded-0' placeholder=' Enter name' name='name' 
