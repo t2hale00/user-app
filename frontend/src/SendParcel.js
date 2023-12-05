@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Dropdown, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -26,6 +26,9 @@ function SendParcel() {
   });
 
   const [notification, setNotification] = useState(null);
+
+    // Add a new state to store the list of locations
+  const [locations, setLocations] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -105,15 +108,76 @@ function SendParcel() {
     }));
   }
 
-  function handleLocationSelect(selectedLocation) {
-    const reservationCode = generateReservationCode(selectedLocation);
+  // New function to reserve a cabinet
+  // Updated function to reserve a cabinet
+const reserveCabinet = async (Locationid) => {
+  try {
+    const response = await axios.post('http://localhost:8081/reserveCabinet', {
+      Locationid,
+    });
+
+    if (response.status === 200) {
+      const reservedCabinet = response.data.reservedCabinet;
+      console.log(`Cabinet reserved successfully for location ${Locationid}:`, reservedCabinet);
+    } else {
+      console.error('Failed to reserve cabinet');
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      console.log(`No available cabinets for location ${Locationid}`);
+    } else {
+      console.error('Error:', error);
+    }
+  }
+};
+
+
+
+  // Fetch locations when the component mounts
+  useEffect(() => {
+    fetchLocations();
+  }, []);
+
+  // Fetch locations function
+  const fetchLocations = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/locations');
+      console.log('Locations:', response.data);
+      setLocations(response.data);
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+    }
+  };
+  
+  function handleLocationSelect(selectedLocationId) {
+    console.log('Selected Location ID:', selectedLocationId);
+    console.log('Locations:', locations);
+  
+    // Find the selected location by matching locationid
+    const selectedLocation = locations.find((location) => String(location.locationid) === String(selectedLocationId));
+
+    // Check if selectedLocation is undefined
+    if (!selectedLocation) {
+      console.error(`Location with id ${selectedLocationId} not found.`);
+      return;
+    }
+  
+    console.log('Selected Location:', selectedLocation);
+  
+    const locationName = selectedLocation ? selectedLocation.locationname || '' : '';
+    const reservationCode = generateReservationCode(locationName);
+  
     setParcelInfo((prevParcelInfo) => ({
       ...prevParcelInfo,
-      location: selectedLocation,
+      location: locationName,
       reservationCode,
     }));
-  }
 
+     // Reserve a cabinet for the selected location
+     reserveCabinet(selectedLocationId);
+  }
+  
+  
   function generateReservationCode(location) {
     // Generate a random 4-digit number
     const fourDigitCode = Math.floor(1000 + Math.random() * 9000);
@@ -264,23 +328,23 @@ function SendParcel() {
           />
         </Form.Group>
 
-        {/* Delivery Location Dropdown */}
         <h3>Delivery Location</h3>
-        <Form.Group controlId="formLocation">
-          <Form.Label>Select location</Form.Label>
-          <Dropdown onSelect={handleLocationSelect}>
-            <Dropdown.Toggle variant="secondary" id="dropdown-location">
-              {parcelInfo.location ? parcelInfo.location : 'Select location'}
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item eventKey="Prisma Linnanmaa Oulu">Prisma Linnanmaa Oulu</Dropdown.Item>
-              <Dropdown.Item eventKey="Prisma Limingantulli Oulu">Prisma Limingantulli Oulu</Dropdown.Item>
-              <Dropdown.Item eventKey="Prisma Raksila Oulu">Prisma Raksila Oulu</Dropdown.Item>
-              <Dropdown.Item eventKey="K-Citymarket Oulu Rusko4">K-Citymarket Oulu Rusko</Dropdown.Item>
-              <Dropdown.Item eventKey="K-Citymarket Oulu Raksila">K-Citymarket Oulu Raksila</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        </Form.Group>
+              <Form.Group controlId="formLocation">
+                <Form.Label>Select location</Form.Label>
+                <Dropdown onSelect={(selectedLocationId) => handleLocationSelect(selectedLocationId)}>
+                 <Dropdown.Toggle variant="secondary" id="dropdown-location">
+                    {parcelInfo.location ? parcelInfo.location : 'Select location'}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    {locations.map((location) => (
+                      <Dropdown.Item key={location.locationid} eventKey={location.locationid}>
+                        {location.locationname}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Form.Group>
+
 
         {/* Reservation Code */}
         <Form.Group controlId="formReservationCode">
