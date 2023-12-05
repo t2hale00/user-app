@@ -22,7 +22,8 @@ function SendParcel() {
       phoneNumber: '',
     },
     location: '',
-    reservationCode: '',
+    reservationCode: '', 
+    dateReserved: '',  // Include dateReserved in the state
   });
 
   const [notification, setNotification] = useState(null);
@@ -41,7 +42,6 @@ function SendParcel() {
       location,
       reservationCode,
       dateReserved,
-      CabinetId
     } = parcelInfo;
 
     // Your Axios post request here
@@ -60,7 +60,6 @@ function SendParcel() {
         location,
         reservationCode,
         dateReserved,
-        CabinetId,
     }, {
         withCredentials: true,
       });
@@ -87,7 +86,6 @@ function SendParcel() {
           location: '',
           reservationCode: '',
           dateReserved: '',
-          CabinetId: '',
         });
 
         // Show success notification
@@ -177,6 +175,8 @@ const reserveCabinet = async (Locationid) => {
       ...prevParcelInfo,
       location: locationName,
       reservationCode,
+      dateReserved: new Date().toISOString().slice(0, 19).replace("T", " "),
+
     }));
 
      // Reserve a cabinet for the selected location

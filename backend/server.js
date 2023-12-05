@@ -167,6 +167,7 @@ app.get('/locations', (req, res) => {
   });
 });
 
+//API endpoint to reserve a cabinet
 app.post('/reserveCabinet', (req, res) => {
   const { Locationid } = req.body;
 
@@ -232,7 +233,6 @@ app.post('/reserveCabinet', (req, res) => {
 });
 
 
-
   // API endpoint to handle sending parcel information
 app.post('/sendParcel', async (req, res) => {
 
@@ -263,7 +263,6 @@ app.post('/sendParcel', async (req, res) => {
   const recipientPhoneNumber = req.body.recipientPhoneNumber;
   const location = req.body.location;
   const reservationCode = req.body.reservationCode;
-  const dateReserved = req.body.dateReserved;
   const CabinetId = req.body.CabinetId;
   
   db.query('INSERT INTO parcel (userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode, dateReserved, CabinetId) VALUES (?,  ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
