@@ -17,6 +17,9 @@ function Login() {
     password: ''
   });
 
+  
+  const [notification, setNotification] = useState('');
+
   const handleInput = e => {
     const { name, value } = e.target;
     setValues({
@@ -43,7 +46,12 @@ function Login() {
         navigate('/profile');
       } catch (error) {
         console.error('Authentication failed:', error.response?.data || error.message);
-        setErrors({ email: 'Invalid email or password', password: 'Invalid email or password' });
+
+        if (error.response && error.response.status === 404) {
+          setNotification('User is not registered. Create an account to use the app.');
+        } else {
+          setErrors({ email: 'Invalid email or password', password: 'Invalid email or password' });
+        }
       }
     }
   };
@@ -52,6 +60,11 @@ function Login() {
     <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
       <div className='bg-white p-3 rounded w-25'>
         <h2>Log in</h2>
+        {notification && (
+          <div className='alert alert-warning' role='alert'>
+            {notification}
+          </div>
+        )}
         <form action=""  onSubmit={handleSubmit}>
         <div className='mb-3'>
           <label htmlFor="email"><strong>Username</strong></label>
