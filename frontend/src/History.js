@@ -66,6 +66,8 @@ function History() {
                     <br />
                     <strong>Cabinet Code:</strong> {parcel.reservationCode}
                     <br />
+                    <strong>Reservation Date:</strong> {parcel.dateReserved}
+                    <br />
                     <strong>Status:</strong> {parcel.status}
                     </Card.Text>
                 </Card.Body>
