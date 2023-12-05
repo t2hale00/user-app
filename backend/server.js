@@ -181,7 +181,13 @@ app.post('/reserveCabinet', (req, res) => {
     }
 
     // Assuming cabinetID is the unique identifier for each cabinet
-    const reserveCabinetQuery = `UPDATE cabinets SET IsAvailable = false WHERE Locationid = ? AND IsAvailable = true LIMIT 1`;
+    const reserveCabinetQuery = `
+          UPDATE cabinets
+          SET IsAvailable = false
+          WHERE Locationid = ? AND IsAvailable = true
+          ORDER BY cabinetID
+          LIMIT 1
+        `;
 
     db.query(reserveCabinetQuery, [Locationid], (error, results) => {
       if (error) {
@@ -193,7 +199,7 @@ app.post('/reserveCabinet', (req, res) => {
       } else {
         console.log('Affected Rows:', results.affectedRows);
         if (results.affectedRows > 0) {
-          const reservedCabinetQuery = 'SELECT cabinetID, CabinetNumber FROM cabinets WHERE Locationid = ? AND IsAvailable = false LIMIT 1';
+          const reservedCabinetQuery = 'SELECT cabinetID, CabinetNumber FROM cabinets WHERE Locationid = ? AND IsAvailable = false ORDER BY cabinetID DESC LIMIT 1';
           db.query(reservedCabinetQuery, [Locationid], (err, cabinetResults) => {
             if (err) {
               console.error('Error fetching reserved cabinet information:', err);
@@ -320,21 +326,7 @@ app.get('/availableCabinets/:location', (req, res) => {
   });
 });
 
-// Add an endpoint to reserve a cabinet
-app.post('/reserveCabinet', (req, res) => {
-  const { cabinetId } = req.body;
 
-  const updateQuery = 'UPDATE cabinets SET isReserved = true WHERE id = ?';
-
-  db.query(updateQuery, [cabinetId], (err, result) => {
-    if (err) {
-      console.error('Error reserving cabinet:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      res.status(200).json({ message: 'Cabinet reserved successfully' });
-    }
-  });
-});
 
 app.post('/pickupParcel', (req, res) => {
   const { reservationCode } = req.body;
