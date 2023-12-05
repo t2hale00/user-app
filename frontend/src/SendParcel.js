@@ -128,6 +128,9 @@ const reserveCabinet = async (Locationid) => {
     }
   } catch (error) {
     if (error.response && error.response.status === 400) {
+      // No available cabinets for location
+      setNotification("There are no available cabinets in this location");
+      
       console.log(`No available cabinets for location ${Locationid}`);
     } else {
       console.error('Error:', error);
@@ -154,6 +157,9 @@ const reserveCabinet = async (Locationid) => {
   };
   
   function handleLocationSelect(selectedLocationId) {
+      // Clear existing notification
+      setNotification(null);
+
     console.log('Selected Location ID:', selectedLocationId);
     console.log('Locations:', locations);
   
