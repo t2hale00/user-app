@@ -257,9 +257,11 @@ app.post('/sendParcel', async (req, res) => {
   const recipientPhoneNumber = req.body.recipientPhoneNumber;
   const location = req.body.location;
   const reservationCode = req.body.reservationCode;
+  const dateReserved = req.body.dateReserved;
+  const CabinetId = req.body.CabinetId;
   
-  db.query('INSERT INTO parcel (userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode) VALUES (?,  ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-  [userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode],
+  db.query('INSERT INTO parcel (userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode, dateReserved, CabinetId) VALUES (?,  ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+  [userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode, dateReserved, CabinetId],
   (err, result) => {
     if (err) {
       console.log(err);
@@ -333,6 +335,68 @@ app.post('/reserveCabinet', (req, res) => {
     }
   });
 });
+
+app.post('/pickupParcel', (req, res) => {
+  const { reservationCode } = req.body;
+
+  // Check if the reservation code exists in the parcels table
+  const checkReservationCodeQuery = 'SELECT * FROM parcels WHERE ReservationCode = ? AND Status = "Not Delivered" LIMIT 1';
+  
+  db.query(checkReservationCodeQuery, [reservationCode], (checkError, checkResults) => {
+    if (checkError) {
+      console.error('Error checking reservation code:', checkError);
+      res.status(500).json({ error: 'Internal server error' });
+    } else if (checkResults.length === 0) {
+      // Reservation code not found or parcel already delivered
+      res.status(404).json({ error: 'Parcel not found or already delivered' });
+    } else {
+      const parcel = checkResults[0];
+
+      // Assuming CabinetID is the foreign key in the parcels table
+      const cabinetID = parcel.CabinetID;
+
+      // Fetch cabinet information using CabinetID
+      const fetchCabinetQuery = 'SELECT * FROM cabinets WHERE CabinetID = ? LIMIT 1';
+
+      db.query(fetchCabinetQuery, [cabinetID], (fetchError, cabinetResults) => {
+        if (fetchError) {
+          console.error('Error fetching cabinet information:', fetchError);
+          res.status(500).json({ error: 'Internal server error' });
+        } else if (cabinetResults.length === 0) {
+          // Cabinet not found
+          res.status(404).json({ error: 'Cabinet not found for the reservation code' });
+        } else {
+          const cabinet = cabinetResults[0];
+
+          // Update parcel status to "Shipping to Pickup location"
+          const updateParcelStatusQuery = 'UPDATE parcels SET Status = "Shipping to Pickup location" WHERE ReservationCode = ?';
+
+          db.query(updateParcelStatusQuery, [reservationCode], (updateError) => {
+            if (updateError) {
+              console.error('Error updating parcel status:', updateError);
+              res.status(500).json({ error: 'Internal server error' });
+            } else {
+              // Update cabinet status or perform any other actions needed
+              // For example, you can set IsAvailable to true for the cabinet
+              const updateCabinetQuery = 'UPDATE cabinets SET IsAvailable = true WHERE CabinetID = ?';
+
+              db.query(updateCabinetQuery, [cabinetID], (updateCabinetError) => {
+                if (updateCabinetError) {
+                  console.error('Error updating cabinet status:', updateCabinetError);
+                  res.status(500).json({ error: 'Internal server error' });
+                } else {
+                  // Success, respond with the cabinet and parcel information
+                  res.status(200).json({ message: 'Parcel picked up successfully', cabinet, parcel });
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
+
 
 
 
