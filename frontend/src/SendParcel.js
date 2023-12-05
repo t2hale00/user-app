@@ -40,6 +40,8 @@ function SendParcel() {
       recipient,
       location,
       reservationCode,
+      dateReserved,
+      CabinetId
     } = parcelInfo;
 
     // Your Axios post request here
@@ -57,6 +59,8 @@ function SendParcel() {
         recipientPhoneNumber: recipient.phoneNumber,
         location,
         reservationCode,
+        dateReserved,
+        CabinetId,
     }, {
         withCredentials: true,
       });
@@ -82,6 +86,8 @@ function SendParcel() {
           },
           location: '',
           reservationCode: '',
+          dateReserved: '',
+          CabinetId: '',
         });
 
         // Show success notification
