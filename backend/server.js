@@ -263,6 +263,7 @@ app.post('/sendParcel', async (req, res) => {
   const recipientPhoneNumber = req.body.recipientPhoneNumber;
   const location = req.body.location;
   const reservationCode = req.body.reservationCode;
+  const dateReserved = req.body.dateReserved;
   const CabinetId = req.body.CabinetId;
   
   db.query('INSERT INTO parcel (userId, userEmail, width, height, length, weight, senderName, senderAddress, senderPhoneNumber, recipientName, recipientAddress, recipientPhoneNumber, location, reservationCode, dateReserved, CabinetId) VALUES (?,  ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
