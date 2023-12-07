@@ -51,7 +51,7 @@ function Signup() {
 
   return (
     <div className='d-flex justify-content-center align-items-center bg-primary vh-100'>
-      <div className='bg-white p-3 rounded w-25'>
+      <div className='bg-white p-3 rounded'>
         <h2>Sign up</h2>
         <form action=""  onSubmit={handleSubmit}>
         {notification && <p className={notification.includes('successfully') ? 'text-success' : 'text-danger'}>{notification}</p>}
