@@ -218,11 +218,11 @@ const reserveCabinet = async (Locationid) => {
        {/* Success Notification */}
        {notification && <Alert variant="success">{notification}</Alert>}
 
-      <div className='p-3 rounded w-25' style={{ color: 'white', borderColor: 'lightblue', borderWidth: '5px', borderStyle: 'solid', width: '300px', textAlign: 'center', marginBottom: '30px' }}>
+      <div className='p-3 rounded' style={{ color: 'white', borderColor: 'lightblue', borderWidth: '5px', borderStyle: 'solid', width: '300px', textAlign: 'center', marginBottom: '30px' }}>
         <h1>Send Parcel</h1>
       </div>
-      <div className='bg-white p-3 rounded w-25 '>
-        
+      
+      <div className='bg-white p-3 rounded '>
         {/* Parcel Size */}
       <h1>Parcel Size</h1>
       <Form onSubmit={handleSubmit}>
