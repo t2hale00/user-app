@@ -184,7 +184,7 @@ app.post('/reserveCabinet', (req, res) => {
     // Assuming cabinetID is the unique identifier for each cabinet
     const reserveCabinetQuery = `
           UPDATE cabinets
-          SET IsAvailable = false
+          SET IsAvailable = false, cabinetstatus = 'Reserved'
           WHERE Locationid = ? AND IsAvailable = true
           ORDER BY cabinetID
           LIMIT 1
