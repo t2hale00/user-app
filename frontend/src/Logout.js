@@ -26,7 +26,7 @@ function Logout() {
         setTimeout(() => {
           console.log('Redirecting...');
           navigate('/');
-        }, 3000);
+        }, 2000);
       } catch (error) {
         console.error('Logout error:', error);
         setLoading(false); // Set loading to false even if an error occurs
