@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Dropdown } from 'react-bootstrap';
 
 const DeleteAccountButton = () => {
-  const [message, setMessage] = useState('');
+  const [notification, setNotification] = useState('');
   const [error, setError] = useState('');
 
   const handleDeleteAccount = async () => {
@@ -19,7 +19,8 @@ const DeleteAccountButton = () => {
 
       if (response.ok) {
         // If response is successful, redirect to the signup page
-        setMessage('Account deleted successfully');
+        setNotification('Account deleted successfully');
+        console.log ('Account deleted successfully.');
         window.location.href = '/signup';
       } else {
         // If response is not successful, handle the error
@@ -61,7 +62,7 @@ const DeleteAccountButton = () => {
             <p>Are you sure you want to delete you account?</p>
         </div>
         <button type="submit" className='btn btn-danger w-100 rounded-0' onClick={handleDeleteAccount}>Delete Account</button>
-        {message && <p>{message}</p>}
+        {notification && <p>{notification}</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <br></br>
         <div className='d-flex justify-content-center align-items-center'>

@@ -142,7 +142,6 @@ app.delete('/deleteaccount', (req, res) => {
   }
 
   const userId = req.session.user.userid;
-
   const deleteSql = 'DELETE FROM user WHERE userId = ?';
   const deleteValues = [userId];
 
@@ -155,6 +154,7 @@ app.delete('/deleteaccount', (req, res) => {
       req.session.destroy();
       res.clearCookie('access-token');
       res.status(200).json({ message: 'Account deleted successfully' });
+      console.log ('Account deleted successfully.');
     }
   });
 });
