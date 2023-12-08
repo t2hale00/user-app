@@ -315,9 +315,6 @@ app.post('/reserveCabinet', (req, res) => {
 app.post('/reserveCabinet', (req, res) => {
 
   const { Locationid, reservationCode } = req.body;
-  
-
-  console.log('Generated reservationCode in frontend:', reservationCode);
 
   console.log('Received Locationid:', Locationid);
   console.log('Received reservationCode:', reservationCode);
@@ -357,7 +354,7 @@ app.post('/reserveCabinet', (req, res) => {
           console.log(`Cabinet reserved successfully for location ${Locationid} with reservation code ${reservationCode}`);
 
           // Fetch reserved cabinet information
-          const reservedCabinetQuery = 'SELECT cabinetID, CabinetNumber FROM cabinets WHERE Locationid = ? AND IsAvailable = false ORDER BY cabinetID DESC LIMIT 1';
+          const reservedCabinetQuery = 'SELECT cabinetID, CabinetNumber FROM cabinets WHERE Locationid = ? AND IsAvailable = true ORDER BY cabinetID DESC LIMIT 1';
           db.query(reservedCabinetQuery, [Locationid], (err, cabinetResults) => {
             if (err) {
               console.error('Error fetching reserved cabinet information:', err);
