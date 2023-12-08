@@ -90,9 +90,6 @@ app.post('/login', async (req, res) => {
     if (data.length > 0) {
       const user = { userid: data[0].userid, email: data[0].email };
 
-      // Log the user information before setting it in the session
-      console.log("User before setting in session:", { id: user.userid, email: user.email });
-
       const accessToken = createTokens({ id: user.userid, email: user.email }); // Use the imported function
       console.log('Generated Access Token:', accessToken);
       req.session.user = user;
@@ -105,12 +102,9 @@ app.post('/login', async (req, res) => {
       });
 
       res.json({ message: "Logged in successfully", user: { id: user.userid, email: user.email } });
-      console.log("Session:", req.session);
-      console.log("User in session:", req.session.user ? req.session.user.userid : "Not available");
-      console.log('Session after login:', req.session);
 
     } else {
-      res.status(400).json({ message: 'User not found' });
+      res.status(404).json({message: 'User not found. Please create an account.' });
     }
   });
 });
