@@ -174,7 +174,7 @@ app.get('/locations', (req, res) => {
 });
 
 //API endpoint to reserve a cabinet
-/*app.post('/reserveCabinet', (req, res) => {
+app.post('/reserveCabinet', (req, res) => {
   const { Locationid } = req.body;
 
   console.log('Received Locationid:', Locationid);
@@ -236,172 +236,9 @@ app.get('/locations', (req, res) => {
       }
     });
   });
-});*/
-
-/*// API endpoint to reserve a cabinet
-app.post('/reserveCabinet', (req, res) => {
-  const { Locationid, reservationCode } = req.body;
-
-  console.log('Received Locationid:', Locationid);
-  console.log('Received reservationCode:', reservationCode);
-
-  // Check if reservationCode is a non-empty string
-  if (!reservationCode || typeof reservationCode !== 'string' || reservationCode.trim() === '') {
-    return res.status(400).json({ error: 'Invalid reservation code' });
-  }
-
-  // Start a transaction
-  db.beginTransaction(function (err) {
-    if (err) {
-      console.error('Error starting transaction:', err);
-      res.status(500).json({ error: 'Internal server error' });
-      return;
-    }
-
-    // Assuming cabinetID is the unique identifier for each cabinet
-    const reserveCabinetQuery = `
-      UPDATE cabinets
-      SET IsAvailable = false, cabinetstatus = 'Reserved', Code = ?
-      WHERE Locationid = ? AND IsAvailable = true
-      ORDER BY cabinetID
-      LIMIT 1
-    `;
-
-    db.query(reserveCabinetQuery, [reservationCode, Locationid], (error, results) => {
-      if (error) {
-        console.error('Error reserving cabinet:', error);
-        // Rollback the transaction in case of an error
-        db.rollback(function () {
-          res.status(500).json({ error: 'Internal server error' });
-        });
-      } else {
-        console.log('Affected Rows:', results.affectedRows);
-        if (results.affectedRows > 0) {
-          console.log(`Cabinet reserved successfully for location ${Locationid} with reservation code ${reservationCode}`);
-
-          // Commit the transaction if everything is successful
-          db.commit(function (commitErr) {
-            if (commitErr) {
-              console.error('Error committing transaction:', commitErr);
-              res.status(500).json({ error: 'Internal server error' });
-            } else {
-              // Update the Code column in the reserved cabinet
-              const updateCodeQuery = 'UPDATE cabinets SET Code = ? WHERE cabinetID = ?';
-              db.query(updateCodeQuery, [reservationCode, results.insertId], (updateErr, updateResults) => {
-                if (updateErr) {
-                  console.error('Error updating Code in cabinets table:', updateErr);
-                  // Rollback the transaction in case of an error
-                  db.rollback(function () {
-                    res.status(500).json({ error: 'Internal server error' });
-                  });
-                } else {
-                  console.log(`Code updated in cabinets table for cabinetID ${results.insertId}`);
-                  res.status(200).json({ message: 'Cabinet reserved successfully', reservationCode });
-                }
-              });
-            }
-          });
-        } else {
-          console.log(`No available cabinets for location ${Locationid}`);
-          res.status(400).json({ error: 'No available cabinets' });
-        }
-      }
-    });
-  });
-});
-*/
-
-// API endpoint to reserve a cabinet
-app.post('/reserveCabinet', (req, res) => {
-
-  const { Locationid, reservationCode } = req.body;
-
-  console.log('Received Locationid:', Locationid);
-  console.log('Received reservationCode:', reservationCode);
-
-  // Check if reservationCode is a non-empty string
-  if (!reservationCode || typeof reservationCode !== 'string' || reservationCode.trim() === '') {
-    return res.status(400).json({ error: 'Invalid reservation code' });
-  }
-
-  // Start a transaction
-  db.beginTransaction(function (err) {
-    if (err) {
-      console.error('Error starting transaction:', err);
-      res.status(500).json({ error: 'Internal server error' });
-      return;
-    }
-
-    // Assuming cabinetID is the unique identifier for each cabinet
-    const reserveCabinetQuery = `
-      UPDATE cabinets
-      SET IsAvailable = false, cabinetstatus = 'Reserved', Code = ?
-      WHERE Locationid = ? AND IsAvailable = true
-      ORDER BY cabinetID
-      LIMIT 1
-    `;
-
-    db.query(reserveCabinetQuery, [reservationCode, Locationid], (error, results) => {
-      if (error) {
-        console.error('Error reserving cabinet:', error);
-        // Rollback the transaction in case of an error
-        db.rollback(function () {
-          res.status(500).json({ error: 'Internal server error' });
-        });
-      } else {
-        console.log('Affected Rows:', results.affectedRows);
-        if (results.affectedRows > 0) {
-          console.log(`Cabinet reserved successfully for location ${Locationid} with reservation code ${reservationCode}`);
-
-          // Fetch reserved cabinet information
-          const reservedCabinetQuery = 'SELECT cabinetID, CabinetNumber FROM cabinets WHERE Locationid = ? AND IsAvailable = true ORDER BY cabinetID DESC LIMIT 1';
-          db.query(reservedCabinetQuery, [Locationid], (err, cabinetResults) => {
-            if (err) {
-              console.error('Error fetching reserved cabinet information:', err);
-              // Rollback the transaction in case of an error
-              db.rollback(function () {
-                res.status(500).json({ error: 'Internal server error' });
-              });
-            } else {
-              const reservedCabinet = cabinetResults[0];
-              console.log(`Cabinet reserved successfully for location ${Locationid}:`, reservedCabinet);
-
-              // Update the Code column in the reserved cabinet
-              const updateCodeQuery = 'UPDATE cabinets SET Code = ? WHERE cabinetID = ?';
-              db.query(updateCodeQuery, [reservationCode, reservedCabinet.cabinetID], (updateErr, updateResults) => {
-                if (updateErr) {
-                  console.error('Error updating Code in cabinets table:', updateErr);
-                  // Rollback the transaction in case of an error
-                  db.rollback(function () {
-                    res.status(500).json({ error: 'Internal server error' });
-                  });
-                } else {
-                  console.log(`Code updated in cabinets table for cabinetID ${reservedCabinet.cabinetID}`);
-
-                  // Commit the transaction if everything is successful
-                  db.commit(function (commitErr) {
-                    if (commitErr) {
-                      console.error('Error committing transaction:', commitErr);
-                      res.status(500).json({ error: 'Internal server error' });
-                    } else {
-                      res.status(200).json({ message: 'Cabinet reserved successfully', reservedCabinet });
-                    }
-                  });
-                }
-              });
-            }
-          });
-        } else {
-          console.log(`No available cabinets for location ${Locationid}`);
-          res.status(400).json({ error: 'No available cabinets' });
-        }
-      }
-    });
-  });
 });
 
-
-  // API endpoint to handle sending parcel information
+// API endpoint to handle sending parcel information
 app.post('/sendParcel', async (req, res) => {
 
   console.log('Session in /sendParcel:', req.session);
@@ -449,7 +286,31 @@ app.post('/sendParcel', async (req, res) => {
 );
 });
 
-//Create a history endpoint where the user can access sent parcel information
+
+// Endpoint to handle sending reservationCode to the cabinets table
+app.post('/sendReservationCode', (req, res) => {
+  const { reservationCode, reservedCabinet } = req.body;
+  const cabinetID = reservedCabinet.cabinetID;
+
+  // Perform the database update using reservationCode
+  const updateQuery = 'UPDATE cabinets SET Code = ?  WHERE cabinetID = ?';
+
+  db.query(updateQuery, [reservationCode, cabinetID ], (updateError, updateResult) => {
+    if (updateError) {
+      console.error('Error updating cabinets table with reservationCode:', updateError);
+      res.status(500).send('Error updating cabinets table with reservationCode');
+      return;
+    }
+
+    console.log('ReservationCode updated in cabinets table');
+    console.log('ReservationCode:', reservationCode);
+    res.status(200).send('ReservationCode updated in cabinets table');
+  });
+});
+
+
+
+//History endpoint where the user can access sent parcel information
 app.get ('/history', (req, res) => {
  
   if (!req.session || !req.session.user) {
@@ -478,7 +339,7 @@ app.get ('/history', (req, res) => {
 });
 });
 
-// Add an endpoint to get available cabinets for a specific location
+/*// Add an endpoint to get available cabinets for a specific location
 app.get('/availableCabinets/:location', (req, res) => {
   const { location } = req.params;
 
@@ -555,10 +416,7 @@ app.post('/pickupParcel', (req, res) => {
       });
     }
   });
-});
-
-
-
+});*/
 
 //Send Notification endpoint
 

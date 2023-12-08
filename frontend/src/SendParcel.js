@@ -100,7 +100,6 @@ function SendParcel() {
       console.error('Error:', error);
     }
   };
-  
 
   function handleInputChange(category, field, value) {
     setParcelInfo((prevParcelInfo) => ({
@@ -111,34 +110,6 @@ function SendParcel() {
       },
     }));
   }
-
-  // New function to reserve a cabinet
-  // Updated function to reserve a cabinet
-const reserveCabinet = async (Locationid) => {
-  try {
-    const response = await axios.post('http://localhost:8081/reserveCabinet', {
-      Locationid,
-    });
-
-    if (response.status === 200) {
-      const reservedCabinet = response.data.reservedCabinet;
-      console.log(`Cabinet reserved successfully for location ${Locationid}:`, reservedCabinet);
-    } else {
-      console.error('Failed to reserve cabinet');
-    }
-  } catch (error) {
-    if (error.response && error.response.status === 400) {
-      // No available cabinets for location
-      setNotification("There are no available cabinets in this location");
-      
-      console.log(`No available cabinets for location ${Locationid}`);
-    } else {
-      console.error('Error:', error);
-    }
-  }
-};
-
-
 
   // Fetch locations when the component mounts
   useEffect(() => {
@@ -156,9 +127,9 @@ const reserveCabinet = async (Locationid) => {
     }
   };
   
-  function handleLocationSelect(selectedLocationId) {
-      // Clear existing notification
-      setNotification(null);
+function handleLocationSelect(selectedLocationId) {
+    // Clear existing notification
+    setNotification(null);
 
     console.log('Selected Location ID:', selectedLocationId);
     console.log('Locations:', locations);
@@ -182,19 +153,68 @@ const reserveCabinet = async (Locationid) => {
       location: locationName,
       reservationCode,
       dateReserved: new Date().toISOString().slice(0, 19).replace("T", " "),
-
     }));
 
-     // Reserve a cabinet for the selected location
-     reserveCabinet(selectedLocationId);
+    // Reserve a cabinet for the selected location
+    reserveCabinet(selectedLocationId, reservationCode);
   }
-  
   
   function generateReservationCode(location) {
     // Generate a random 4-digit number
     const fourDigitCode = Math.floor(1000 + Math.random() * 9000);
     return fourDigitCode.toString();
   }
+
+  // Updated function to reserve a cabinet
+const reserveCabinet = async (Locationid, reservationCode) => {
+  try {
+    const response = await axios.post('http://localhost:8081/reserveCabinet', {
+      Locationid,
+    });
+
+    if (response.status === 200) {
+      const reservedCabinet = response.data.reservedCabinet;
+      console.log(`Cabinet reserved successfully for location ${Locationid}:`, reservedCabinet);
+
+      // Extract cabinetID from the reservedCabinet
+      const cabinetID = reservedCabinet.cabinetID;
+
+      // Now you can use the cabinetID in your additional logic or other functions
+      // For example, you may want to send the reservationCode to the cabinets table
+      await sendReservationCode(reservationCode, cabinetID);
+
+    } else {
+      console.error('Failed to reserve cabinet');
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 400) {
+      // No available cabinets for location
+      setNotification("There are no available cabinets in this location");
+
+      console.log(`No available cabinets for location ${Locationid}`);
+    } else {
+      console.error('Error:', error);
+    }
+  }
+};
+
+// Additional function to send reservationCode to cabinets table
+const sendReservationCode = async (reservationCode, cabinetID) => {
+  try {
+    const response = await axios.post('http://localhost:8081/sendReservationCode', {
+      reservationCode,
+      reservedCabinet: { cabinetID },  // Send the reservedCabinet object with cabinetID
+    });
+
+    if (response.status === 200) {
+      console.log('ReservationCode sent to cabinets table successfully:', response.data);
+    } else {
+      console.error('Failed to send ReservationCode to cabinets table');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
 
   return (
     <div className='d-flex flex-column justify-content-center align-items-center bg-primary'>
