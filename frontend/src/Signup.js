@@ -37,11 +37,11 @@ function Signup() {
         if(errors.name === "" && errors.email === "" && errors.password === ""){
           axios.post('http://localhost:8081/signup', values)
           .then((res) => {
-            setNotification('Account created successfully');
+            setNotification('Account created successfully. Redirecting to Login page');
             // Navigate to login page after a short delay
             setTimeout(() => {
               navigate('/');
-            }, 2000); })
+            }, 3000); })
           .catch((err) => {
             console.error(err);
             if (err.response && err.response.status === 409) {
