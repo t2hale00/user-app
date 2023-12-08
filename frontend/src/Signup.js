@@ -41,10 +41,14 @@ function Signup() {
             // Navigate to login page after a short delay
             setTimeout(() => {
               navigate('/');
-            }, 3000); })
+            }, 2000); })
           .catch((err) => {
             console.error(err);
-            setNotification('Error creating account. Please try again.');
+            if (err.response && err.response.status === 409) {
+              setNotification('Account already exists. Please login.');
+            } else {
+              setNotification('Error creating account. Please try again.');
+            }
           });
       }
     };

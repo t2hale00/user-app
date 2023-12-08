@@ -40,20 +40,35 @@ db.connect((err) => {
   console.log('Connected to the database');
 });
 
-// signup endpoint
+// Signup endpoint
 app.post('/signup', async (req, res) => {
   const { name, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const sql = "INSERT INTO user (`name`, `email`, `password`) VALUES (?, ?, ?)";
-  const values = [name, email, hashedPassword];
-
-  db.query(sql, values, (err, data) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Error while saving user to the database" });
+  // Check if the user already exists
+  const checkUserQuery = "SELECT * FROM user WHERE email = ?";
+  db.query(checkUserQuery, [email], (checkErr, checkData) => {
+    if (checkErr) {
+      console.error(checkErr);
+      return res.status(500).json({ error: "Error while checking user existence" });
     }
-    return res.status(201).json({ message: "User registered successfully" });
+
+    if (checkData.length > 0) {
+      // User already exists, return a conflict status
+      return res.status(409).json({ error: "User already exists" });
+    }
+
+    // User doesn't exist, proceed with the signup
+    const insertUserQuery = "INSERT INTO user (name, email, password) VALUES (?, ?, ?)";
+    const insertValues = [name, email, hashedPassword];
+
+    db.query(insertUserQuery, insertValues, (insertErr, insertData) => {
+      if (insertErr) {
+        console.error(insertErr);
+        return res.status(500).json({ error: "Error while saving user to the database" });
+      }
+      return res.status(201).json({ message: "User registered successfully" });
+    });
   });
 });
 
@@ -70,10 +85,7 @@ app.post('/login', async (req, res) => {
       console.error(err);
       return res.status(500).json({ message: 'Error while querying the database' });
     }
-
     console.log("Data from the database:", data);
-
-
 
     if (data.length > 0) {
       const user = { userid: data[0].userid, email: data[0].email };
@@ -168,7 +180,7 @@ app.get('/locations', (req, res) => {
 });
 
 //API endpoint to reserve a cabinet
-app.post('/reserveCabinet', (req, res) => {
+/*app.post('/reserveCabinet', (req, res) => {
   const { Locationid } = req.body;
 
   console.log('Received Locationid:', Locationid);
@@ -219,6 +231,171 @@ app.post('/reserveCabinet', (req, res) => {
                   res.status(500).json({ error: 'Internal server error' });
                 } else {
                   res.status(200).json({ message: 'Cabinet reserved successfully', reservedCabinet });
+                }
+              });
+            }
+          });
+        } else {
+          console.log(`No available cabinets for location ${Locationid}`);
+          res.status(400).json({ error: 'No available cabinets' });
+        }
+      }
+    });
+  });
+});*/
+
+/*// API endpoint to reserve a cabinet
+app.post('/reserveCabinet', (req, res) => {
+  const { Locationid, reservationCode } = req.body;
+
+  console.log('Received Locationid:', Locationid);
+  console.log('Received reservationCode:', reservationCode);
+
+  // Check if reservationCode is a non-empty string
+  if (!reservationCode || typeof reservationCode !== 'string' || reservationCode.trim() === '') {
+    return res.status(400).json({ error: 'Invalid reservation code' });
+  }
+
+  // Start a transaction
+  db.beginTransaction(function (err) {
+    if (err) {
+      console.error('Error starting transaction:', err);
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+
+    // Assuming cabinetID is the unique identifier for each cabinet
+    const reserveCabinetQuery = `
+      UPDATE cabinets
+      SET IsAvailable = false, cabinetstatus = 'Reserved', Code = ?
+      WHERE Locationid = ? AND IsAvailable = true
+      ORDER BY cabinetID
+      LIMIT 1
+    `;
+
+    db.query(reserveCabinetQuery, [reservationCode, Locationid], (error, results) => {
+      if (error) {
+        console.error('Error reserving cabinet:', error);
+        // Rollback the transaction in case of an error
+        db.rollback(function () {
+          res.status(500).json({ error: 'Internal server error' });
+        });
+      } else {
+        console.log('Affected Rows:', results.affectedRows);
+        if (results.affectedRows > 0) {
+          console.log(`Cabinet reserved successfully for location ${Locationid} with reservation code ${reservationCode}`);
+
+          // Commit the transaction if everything is successful
+          db.commit(function (commitErr) {
+            if (commitErr) {
+              console.error('Error committing transaction:', commitErr);
+              res.status(500).json({ error: 'Internal server error' });
+            } else {
+              // Update the Code column in the reserved cabinet
+              const updateCodeQuery = 'UPDATE cabinets SET Code = ? WHERE cabinetID = ?';
+              db.query(updateCodeQuery, [reservationCode, results.insertId], (updateErr, updateResults) => {
+                if (updateErr) {
+                  console.error('Error updating Code in cabinets table:', updateErr);
+                  // Rollback the transaction in case of an error
+                  db.rollback(function () {
+                    res.status(500).json({ error: 'Internal server error' });
+                  });
+                } else {
+                  console.log(`Code updated in cabinets table for cabinetID ${results.insertId}`);
+                  res.status(200).json({ message: 'Cabinet reserved successfully', reservationCode });
+                }
+              });
+            }
+          });
+        } else {
+          console.log(`No available cabinets for location ${Locationid}`);
+          res.status(400).json({ error: 'No available cabinets' });
+        }
+      }
+    });
+  });
+});
+*/
+
+// API endpoint to reserve a cabinet
+app.post('/reserveCabinet', (req, res) => {
+
+  const { Locationid, reservationCode } = req.body;
+  
+
+  console.log('Generated reservationCode in frontend:', reservationCode);
+
+  console.log('Received Locationid:', Locationid);
+  console.log('Received reservationCode:', reservationCode);
+
+  // Check if reservationCode is a non-empty string
+  if (!reservationCode || typeof reservationCode !== 'string' || reservationCode.trim() === '') {
+    return res.status(400).json({ error: 'Invalid reservation code' });
+  }
+
+  // Start a transaction
+  db.beginTransaction(function (err) {
+    if (err) {
+      console.error('Error starting transaction:', err);
+      res.status(500).json({ error: 'Internal server error' });
+      return;
+    }
+
+    // Assuming cabinetID is the unique identifier for each cabinet
+    const reserveCabinetQuery = `
+      UPDATE cabinets
+      SET IsAvailable = false, cabinetstatus = 'Reserved', Code = ?
+      WHERE Locationid = ? AND IsAvailable = true
+      ORDER BY cabinetID
+      LIMIT 1
+    `;
+
+    db.query(reserveCabinetQuery, [reservationCode, Locationid], (error, results) => {
+      if (error) {
+        console.error('Error reserving cabinet:', error);
+        // Rollback the transaction in case of an error
+        db.rollback(function () {
+          res.status(500).json({ error: 'Internal server error' });
+        });
+      } else {
+        console.log('Affected Rows:', results.affectedRows);
+        if (results.affectedRows > 0) {
+          console.log(`Cabinet reserved successfully for location ${Locationid} with reservation code ${reservationCode}`);
+
+          // Fetch reserved cabinet information
+          const reservedCabinetQuery = 'SELECT cabinetID, CabinetNumber FROM cabinets WHERE Locationid = ? AND IsAvailable = false ORDER BY cabinetID DESC LIMIT 1';
+          db.query(reservedCabinetQuery, [Locationid], (err, cabinetResults) => {
+            if (err) {
+              console.error('Error fetching reserved cabinet information:', err);
+              // Rollback the transaction in case of an error
+              db.rollback(function () {
+                res.status(500).json({ error: 'Internal server error' });
+              });
+            } else {
+              const reservedCabinet = cabinetResults[0];
+              console.log(`Cabinet reserved successfully for location ${Locationid}:`, reservedCabinet);
+
+              // Update the Code column in the reserved cabinet
+              const updateCodeQuery = 'UPDATE cabinets SET Code = ? WHERE cabinetID = ?';
+              db.query(updateCodeQuery, [reservationCode, reservedCabinet.cabinetID], (updateErr, updateResults) => {
+                if (updateErr) {
+                  console.error('Error updating Code in cabinets table:', updateErr);
+                  // Rollback the transaction in case of an error
+                  db.rollback(function () {
+                    res.status(500).json({ error: 'Internal server error' });
+                  });
+                } else {
+                  console.log(`Code updated in cabinets table for cabinetID ${reservedCabinet.cabinetID}`);
+
+                  // Commit the transaction if everything is successful
+                  db.commit(function (commitErr) {
+                    if (commitErr) {
+                      console.error('Error committing transaction:', commitErr);
+                      res.status(500).json({ error: 'Internal server error' });
+                    } else {
+                      res.status(200).json({ message: 'Cabinet reserved successfully', reservedCabinet });
+                    }
+                  });
                 }
               });
             }
