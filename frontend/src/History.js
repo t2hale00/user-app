@@ -36,6 +36,7 @@ function History() {
             {/* Define routes for other pages using Link */}
             <Dropdown.Item key="home" as={Link} to="/profile">Home</Dropdown.Item>
             <Dropdown.Item key="sendParcel" as={Link} to="/sendparcel">Send Parcel</Dropdown.Item>
+            <Dropdown.Item as={Link} to="/notifications">Notifications</Dropdown.Item>
             <Dropdown.Item key="deleteAccount" as={Link} to="/deleteaccount">Delete Account</Dropdown.Item>
             <Dropdown.Item key="logout" as={Link} to="/logout">Logout</Dropdown.Item>
             {/* Add more items for other pages as needed */}
@@ -77,6 +78,7 @@ function History() {
         </Row>
         </div>
     </div>
+    
     
   );
 }
