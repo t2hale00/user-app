@@ -339,86 +339,32 @@ app.get ('/history', (req, res) => {
 });
 });
 
-/*// Add an endpoint to get available cabinets for a specific location
-app.get('/availableCabinets/:location', (req, res) => {
-  const { location } = req.params;
-
-  const query = 'SELECT cabinetID, CabinetNumber FROM cabinets WHERE location = ? AND isReserved = false';
-  
-  db.query(query, [location], (err, results) => {
-    if (err) {
-      console.error('Error fetching available cabinets:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    } else {
-      res.json(results);
-    }
-  });
-});
-
-
-
-app.post('/pickupParcel', (req, res) => {
-  const { reservationCode } = req.body;
-
-  // Check if the reservation code exists in the parcels table
-  const checkReservationCodeQuery = 'SELECT * FROM parcels WHERE ReservationCode = ? AND Status = "Not Delivered" LIMIT 1';
-  
-  db.query(checkReservationCodeQuery, [reservationCode], (checkError, checkResults) => {
-    if (checkError) {
-      console.error('Error checking reservation code:', checkError);
-      res.status(500).json({ error: 'Internal server error' });
-    } else if (checkResults.length === 0) {
-      // Reservation code not found or parcel already delivered
-      res.status(404).json({ error: 'Parcel not found or already delivered' });
-    } else {
-      const parcel = checkResults[0];
-
-      // Assuming CabinetID is the foreign key in the parcels table
-      const cabinetID = parcel.CabinetID;
-
-      // Fetch cabinet information using CabinetID
-      const fetchCabinetQuery = 'SELECT * FROM cabinets WHERE CabinetID = ? LIMIT 1';
-
-      db.query(fetchCabinetQuery, [cabinetID], (fetchError, cabinetResults) => {
-        if (fetchError) {
-          console.error('Error fetching cabinet information:', fetchError);
-          res.status(500).json({ error: 'Internal server error' });
-        } else if (cabinetResults.length === 0) {
-          // Cabinet not found
-          res.status(404).json({ error: 'Cabinet not found for the reservation code' });
-        } else {
-          const cabinet = cabinetResults[0];
-
-          // Update parcel status to "Shipping to Pickup location"
-          const updateParcelStatusQuery = 'UPDATE parcels SET Status = "Shipping to Pickup location" WHERE ReservationCode = ?';
-
-          db.query(updateParcelStatusQuery, [reservationCode], (updateError) => {
-            if (updateError) {
-              console.error('Error updating parcel status:', updateError);
-              res.status(500).json({ error: 'Internal server error' });
-            } else {
-              // Update cabinet status or perform any other actions needed
-              // For example, you can set IsAvailable to true for the cabinet
-              const updateCabinetQuery = 'UPDATE cabinets SET IsAvailable = true WHERE CabinetID = ?';
-
-              db.query(updateCabinetQuery, [cabinetID], (updateCabinetError) => {
-                if (updateCabinetError) {
-                  console.error('Error updating cabinet status:', updateCabinetError);
-                  res.status(500).json({ error: 'Internal server error' });
-                } else {
-                  // Success, respond with the cabinet and parcel information
-                  res.status(200).json({ message: 'Parcel picked up successfully', cabinet, parcel });
-                }
-              });
-            }
-          });
-        }
-      });
-    }
-  });
-});*/
-
 //Send Notification endpoint
+app.get ('/notifications', (req, res) => {
+ 
+  if (!req.session || !req.session.user) {
+    res.status(401).json({ error: 'Unauthorized' });
+    console.log('Session:', req.session);
+    return;
+  }
+  const userId = req.session.user.userid;
+  const query = 'SELECT * FROM notification WHERE userid = ?';
+
+  db.query(query, [userId], (err, results) => {
+    console.log('Query:', query);
+    console.log('User ID:', userId);
+    console.log('Results:', results);
+    console.log('Error:', err);
+    console.log('Session:', req.session);
+  if (err) {
+     console.error('Error fetching notification:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+    console.log('Session:', req.session);
+  } else {
+     res.json(results);
+  }
+});
+});
 
 app.listen(8081, () => {
     console.log('Listening on port 8081');
