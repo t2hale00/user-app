@@ -52,7 +52,7 @@ function History() {
             <Col key={parcel.parcelId} >
                 <Card style={{ minWidth: '250px', marginBottom: '20px' }}>
                 <Card.Body>
-                    <Card.Title>{`Parcel #${parcel.parcelid}`}</Card.Title>
+                    <Card.Title>{`Your Parcel `}</Card.Title>
                     <Card.Text>
                     <strong>Size:</strong> {`${parcel.width}cm x ${parcel.height}cm x ${parcel.length}cm`}
                     <br />
