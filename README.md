@@ -1,7 +1,7 @@
 **# Parcel App**
 
 
-Welcome to the Parcel App project! This web application simulates an automated parcel delivery point/locker system, akin to popular services like Posti and Matkahuolto in Finland. The system features three primary component applications: **the Consumer Application, the Delivery Driver Application, and the Locker Simulator**. In addition to these three prime features, a **Parcel Generator “Robot”** is also implemented to imitate parcel notification and retrieval.
+Welcome to the Parcel App project! This web application simulates an automated parcel delivery point/locker system, akin to popular services like Posti and Matkahuolto in Finland, wherein a user can send and pickup parcels using a locker delivery system. The system features three primary component applications: **the Consumer Application, the Delivery Driver Application, and the Locker Simulator**. In addition to these three prime features, a **Parcel Generator “Robot”** is also implemented to imitate parcel notification and retrieval.
 
 ## Project Description
 
