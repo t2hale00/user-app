@@ -80,7 +80,7 @@ Thank you for your interest in Parcel App!
 **#Web Development**
 **#consumer-user-app**
 
-## This repository contains all the files used to make a **Consumer User Application**.
+## This repository contains all the files used to make the **Consumer User Application**.
 
 
 **#JavaScript
