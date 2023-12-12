@@ -1,6 +1,4 @@
 ## Parcel App Project 
-<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
-<i class="fas fa-envelope"></i>
 
 
 
