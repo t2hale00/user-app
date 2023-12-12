@@ -52,5 +52,4 @@ describe('Login Component', () => {
     expect(screen.getByText('Logged in successfully')).toBeInTheDocument();
   });
 
-  // Add more test cases for error and edge cases
 });

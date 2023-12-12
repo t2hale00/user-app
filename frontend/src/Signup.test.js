@@ -50,4 +50,5 @@ describe('Signup Component', () => {
     ).toBeInTheDocument();
   });
 
-  });
+  // Add more test cases for error and edge cases, if needed
+});
