@@ -61,8 +61,14 @@ To get started with Parcel App, follow these simple steps:
 
 2. **Install dependencies in every repository:** `npm install`
 
-3. **Configure the backend settings:** Directly set/change the database credentials based on your local database.
-
+3. **Configure the backend settings:** !! Remember to directly set/change the database credentials based on your local database.!!
+         STEPS: Launch MySQL Workbench.
+               Log in and connect to your MySQL database server.
+               Go to "File" -> "Open SQL Script..."
+               Choose your SQL file and click "Open."
+               Click the lightning bolt icon or select "Query" -> "Execute."
+               You can also use MySQL Client.
+                  
 4. **Run the applications:** `npm start` !! RUN THE CONSUMER USER APPLICATION FIRST BEFORE THE OTHER APPS!!
 
 5. **Access Parcel App through your web browser.**
