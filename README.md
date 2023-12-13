@@ -63,9 +63,9 @@ To get started with Parcel App, follow these simple steps:
 
 3. **Configure the backend settings:** Directly set/change the database credentials based on your local database.
 
-4. **Run the applications:** `npm start`
+4. **Run the applications:** `npm start` !! RUN THE USER APPLICATION FIRST BEFORE THE OTHER APPS!!
 
-5. **Access Parcel App through your preferred web browser.**
+5. **Access Parcel App through your web browser.**
 
 ## Link to Working Application on Public Internet
 
